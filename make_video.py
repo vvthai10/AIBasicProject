@@ -2,8 +2,9 @@ import pygame,sys,os
 import cv2
 import shutil
 
-PATH_IMAGES =  "D:\images"
-FPS = 15
+PATH_IMAGES =  os.path.dirname(__file__) + "\image\\"
+PATH_VIDEO = os.path.dirname(__file__) + "\\videos\\"
+FPS = 10
 
 class Video:
  
@@ -22,13 +23,13 @@ class Video:
     
     def make_png(self,screen):
         self.cnt+=1
-        fullpath = self.path + "\\"+self.name + "%08d.png" % self.cnt
+        fullpath = self.path + self.name + "%08d.png" % self.cnt
         # print(fullpath)
         pygame.image.save(screen,fullpath)
  
     def make_mp4(self, name):
         image_folder = self.path
-        video_name = "D:\\videos\\" +  name + '.mp4'
+        video_name = PATH_VIDEO +  name + '.mp4'
 
         images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
         print(images[0])

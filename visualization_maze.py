@@ -1,10 +1,11 @@
 from contextlib import nullcontext
+from pickle import TRUE
 import pygame, sys, os
 import pygame.camera
 from pygame.locals import *
 import math
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs
+from algorithm import algorithm_dfs, algorithm_bfs
 from make_video import Video
 
 WIDTH = 800
@@ -180,16 +181,20 @@ def main(screen, maze, bonus_points, width, height):
             if event.type == pygame.QUIT:
                 run = False
 
+# NOTE: Phần này dùng để khi nhấn phím cách thì thuật toán mới chạy được
             # if event.type == pygame.KEYDOWN:
             #     if event.key == pygame.K_SPACE and start and end:
             #         for row in grid:
             #             for node in row:
             #                 node.update_neighbors(grid)
-
+                    
+            #         algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+# NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
         for row in grid:
             for node in row:
                 node.update_neighbors(grid)
-        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
         run = False
 
     
@@ -201,7 +206,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("maze.txt")
+bonus_points, maze = read_file("./maze/maze_2.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -219,5 +224,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze")
+video.make_mp4("maze_2")
 video.destroy_png()
