@@ -123,6 +123,50 @@ def algorithm_ucs(draw,grid,start,end,clock):
     return False
 
 
+def algorithm_bfs(draw, grid, start, end, clock):
+    way = []
+    path = []
+    parents = {}
+
+    queue = []
+    queue.append(start.get_pos())
+
+    while len(queue) != 0:
+        pos = queue.pop(0)
+
+        if pos in path:
+            continue
+
+        path.append(pos)
+
+        node = grid[pos[0]][pos[1]]
+        if node != start and node != end:
+            node.make_open()
+        
+        if pos == end.get_pos():
+            pos_start = start.get_pos()
+
+            child = end.get_pos()
+            parent = parents[child]
+            while(parent != pos_start):
+                way.append(parent)
+                child = parent
+                parent = parents[child]
+
+            reconstruct_path(way, grid, draw, clock)
+            return True
+
+        for neighbor in node.neighbors:
+            # WARNING!!!!!!!!
+            if not neighbor.get_pos() in path:
+                queue.append(neighbor.get_pos())
+                parents[neighbor.get_pos()] = pos
+        
+        clock.tick(FPS)
+        draw()
+
+    return False
+
 
 
 
