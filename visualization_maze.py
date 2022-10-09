@@ -5,7 +5,7 @@ import pygame.camera
 from pygame.locals import *
 import math
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_greedy_bfs
 from make_video import Video
 
 WIDTH = 800
@@ -199,7 +199,8 @@ def main(screen, maze, bonus_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
                     
-                    algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
         # for row in grid:
         #     for node in row:
@@ -217,7 +218,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_2.txt")
+bonus_points, maze = read_file("./maze/maze_3.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -237,5 +238,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-# video.make_mp4("maze_2_dfs")
-# video.destroy_png()
+video.make_mp4("maze_2_dfs")
+video.destroy_png()
