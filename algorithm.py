@@ -1,8 +1,5 @@
 from queue import PriorityQueue
 
-from queue import PriorityQueue
-
-
 FPS = 5
 
 def reconstruct_path(way, grid, draw, clock):
