@@ -4,8 +4,9 @@ import pygame, sys, os
 import pygame.camera
 from pygame.locals import *
 import math
+import random
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_greedy_bfs
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs
 from make_video import Video
 
 WIDTH = 800
@@ -36,6 +37,7 @@ Description: Node is cell in matrix, it has another state with different color:
 """
 class Node:
     def __init__(self, row, col, size, total_rows, total_cols):
+        self.costs = {}   #cost from this node to near node
         self.row = row
         self.col = col
         self.x = col * size
@@ -112,15 +114,19 @@ class Node:
         self.neighbors = []
         if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_wall(): # DOWN
             self.neighbors.append(grid[self.row + 1][self.col])
+            self.costs[self.row + 1, self.col] = random.randint(1,30)
 
         if self.row > 0 and not grid[self.row - 1][self.col].is_wall(): # UP
             self.neighbors.append(grid[self.row - 1][self.col])
+            self.costs[(self.row - 1), self.col] = random.randint(1,30)
 
         if self.col < self.total_cols - 1 and not grid[self.row][self.col + 1].is_wall(): # RIGHT
             self.neighbors.append(grid[self.row][self.col + 1])
+            self.costs[self.row, (self.col + 1)] = random.randint(1,30)
 
         if self.col > 0 and not grid[self.row][self.col - 1].is_wall(): # LEFT
             self.neighbors.append(grid[self.row][self.col - 1])
+            self.costs[self.row, (self.col-1)] = random.randint(1,30)
     
     def __lt__(self, other):
         return False
@@ -131,6 +137,7 @@ def make_grid(rows, cols):
         grid.append([])
         for j in range(cols):
             node = Node(i, j, SIZE, rows, cols)
+            
             grid[i].append(node)
 
     return grid
@@ -201,6 +208,14 @@ def main(screen, maze, bonus_points, width, height):
                     
                     # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                #chua hieu lam
+                elif event.key == pygame.K_0 and start and end:
+                    for row in grid:
+                        for node in row:
+                            node.update_neighbors(grid)
+                    algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
         # for row in grid:
         #     for node in row:
