@@ -182,19 +182,19 @@ def main(screen, maze, bonus_points, width, height):
                 run = False
 
 # NOTE: Phần này dùng để khi nhấn phím cách thì thuật toán mới chạy được
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_SPACE and start and end:
-            #         for row in grid:
-            #             for node in row:
-            #                 node.update_neighbors(grid)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and start and end:
+                    for row in grid:
+                        for node in row:
+                            node.update_neighbors(grid)
                     
-            #         algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
         for row in grid:
             for node in row:
                 node.update_neighbors(grid)
-        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
         run = False
 
     
@@ -216,6 +216,8 @@ SIZE = 32
 WIDTH = COLS * SIZE
 HEIGHT = ROWS * SIZE
 
+print(WIDTH, HEIGHT)
+
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 video = Video((WIDTH, HEIGHT))
 pygame.display.set_caption("Simulation of finding the way")
@@ -224,5 +226,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_2")
+video.make_mp4("maze_2_dfs")
 video.destroy_png()

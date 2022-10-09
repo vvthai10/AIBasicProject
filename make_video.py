@@ -2,9 +2,9 @@ import pygame,sys,os
 import cv2
 import shutil
 
-PATH_IMAGES =  os.path.dirname(__file__) + "\image\\"
+PATH_IMAGES =  os.path.dirname(__file__) + "\images\\"
 PATH_VIDEO = os.path.dirname(__file__) + "\\videos\\"
-FPS = 10
+FPS = 15
 
 class Video:
  
@@ -32,13 +32,13 @@ class Video:
         video_name = PATH_VIDEO +  name + '.mp4'
 
         images = [img for img in os.listdir(image_folder) if img.endswith(".png")]
-        print(images[0])
 
         frame = cv2.imread(os.path.join(image_folder, images[0]))
 
         height, width, layers = frame.shape
 
-        video = cv2.VideoWriter(video_name, 0, FPS, (width,height))
+        fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+        video = cv2.VideoWriter(video_name, fourcc, FPS, (width,height))
 
         for image in images:
             video.write(cv2.imread(os.path.join(image_folder, image)))
