@@ -6,7 +6,7 @@ from pygame.locals import *
 import math
 import random
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs
 from make_video import Video
 
 WIDTH = 800
@@ -48,6 +48,11 @@ class Node:
         self.bonus = 0
         self.total_rows = total_rows
         self.total_cols = total_cols
+        self.alpha = 255
+
+    def change_alpha(self):
+        if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
+            self.alpha = self.alpha - 20
 
     def get_pos(self):
         return self.row, self.col
@@ -95,9 +100,15 @@ class Node:
     
     def make_path(self):
         self.color = PURPLE
+        self.alpha = 255
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))
+        # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -195,6 +206,8 @@ def main(screen, maze, bonus_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
                     
+                    # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                 #chua hieu lam
                 elif event.key == pygame.K_0 and start and end:
@@ -204,12 +217,12 @@ def main(screen, maze, bonus_points, width, height):
                     algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                 
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        for row in grid:
-            for node in row:
-                node.update_neighbors(grid)
-        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        run = False
+        # for row in grid:
+        #     for node in row:
+        #         node.update_neighbors(grid)
+        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # run = False
 
     
     
@@ -220,7 +233,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_2.txt")
+bonus_points, maze = read_file("./maze/maze_3.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])

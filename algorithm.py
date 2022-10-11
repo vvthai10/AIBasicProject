@@ -1,6 +1,5 @@
 from queue import PriorityQueue
 
-
 FPS = 5
 
 def reconstruct_path(way, grid, draw, clock):
@@ -167,7 +166,67 @@ def algorithm_bfs(draw, grid, start, end, clock):
 
     return False
 
+def algorithm_greedy_bfs(draw, grid, start, end, clock):
 
+    def heuristic_1(neighbor, end):
+        x1, y1 = neighbor.get_pos()
+        x2, y2 = end.get_pos()
+
+        return (x1 - x2) ** 2 + (y1 - y2) ** 2
+
+    def heuristic_2(neighbor, end):
+        x1, y1 = neighbor.get_pos()
+        x2, y2 = end.get_pos()
+
+        return abs(x1-x2) + abs(y1-y2)
+
+    way = []
+    path = []
+    parents = {}
+
+    queue = PriorityQueue()
+
+    queue.put((heuristic_1(start, end), (start.get_pos())))
+
+    while not queue.empty():
+        value_heuristic, (x_pos, y_pos) = queue.get()
+        
+        pos = (x_pos, y_pos)
+
+        if pos in path:
+            continue
+
+        path.append(pos)
+
+        node = grid[pos[0]][pos[1]]
+        if node != start and node != end:
+            node.make_open()
+        
+        if pos == end.get_pos():
+            pos_start = start.get_pos()
+
+            child = end.get_pos()
+            parent = parents[child]
+            while(parent != pos_start):
+                way.append(parent)
+                child = parent
+                parent = parents[child]
+
+            reconstruct_path(way, grid, draw, clock)
+            return True
+
+        for neighbor in node.neighbors:
+            # WARNING!!!!!!!!
+            if not neighbor.get_pos() in path:
+                value = heuristic_1(neighbor, end) 
+                if value <= value_heuristic:
+                    queue.put((value, neighbor.get_pos()))
+                    parents[neighbor.get_pos()] = pos
+        
+        clock.tick(FPS)
+        draw()
+
+    return False
 
 
 
