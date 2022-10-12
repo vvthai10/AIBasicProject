@@ -1,4 +1,5 @@
 from queue import PriorityQueue
+import math
 
 FPS = 5
 
@@ -228,11 +229,190 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
 
     return False
 
+def algorithm_astar(draw, grid, start, end, clock):
+
+    def heuristic_1(neighbor, end):
+        x1, y1 = neighbor.get_pos()
+        x2, y2 = end.get_pos()
+
+        return (x1 - x2) ** 2 + (y1 - y2) ** 2
+
+    def heuristic_2(neighbor, end):
+        x1, y1 = neighbor.get_pos()
+        x2, y2 = end.get_pos()
+
+        return abs(x1-x2) + abs(y1-y2)
 
 
+    # main
+    way = []
+    open = PriorityQueue()
+    closed = []
+    parents = {}
+
+    # Khởi tạo hàm chi phí ban đầu
+    g = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
+
+    # g_start = 1
+    # (f_n, (pos))
+    open.put(( 1 + heuristic_1(start, end), (start.get_pos())))
+
+    while not open.empty():
+        f_prev, (x_cur, y_cur) = open.get()
+
+        if(grid[x_cur][y_cur].is_end()):
+            print("Finally\n")
+            pos_start = start.get_pos()
+
+            child = end.get_pos()
+            parent = parents[child]
+            while(parent != pos_start):
+                way.append(parent)
+                child = parent
+                parent = parents[child]
+
+            reconstruct_path(way, grid, draw, clock)
+            return True
+        
+        if not grid[x_cur][y_cur].is_start():
+            grid[x_cur][y_cur].make_open()
+
+        closed.append((x_cur, y_cur))
+        for neighbor in grid[x_cur][y_cur].neighbors:
+            # WARNING!!!!!!!!
+            x_new, y_new = neighbor.get_pos()
+            if not (x_new, y_new) in closed:
+                g_n = 1 + g[x_cur][y_cur]
+                h_n = heuristic_1(neighbor, end) 
+                f_n = g_n + h_n
+                open.put((f_n, (x_new, y_new)))
+
+                parents[(x_new, y_new)] = (x_cur, y_cur)
+        
+        clock.tick(FPS)
+        draw()
 
 
+def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
+    def get_cos(a, o, b):
+        ao_2 = (a[0] - o[0]) ** 2 + (a[1] - o[1]) ** 2
+        bo_2 = (b[0] - o[0]) ** 2 + (b[1] - o[1]) ** 2
+        ab_2 = (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2
 
+        cos_aob = (ao_2  + bo_2 - ab_2) / (2 * (math.sqrt(ao_2) * math.sqrt(bo_2)))
+        return cos_aob
+    print(start.get_pos())
+    print(end.get_pos())
+
+    def heuristic_1(neighbor, end):
+        x1, y1 = neighbor.get_pos()
+        x2, y2 = end.get_pos()
+
+        return (x1 - x2) ** 2 + (y1 - y2) ** 2
+
+    def heuristic_2(neighbor, end):
+        x1, y1 = neighbor.get_pos()
+        x2, y2 = end.get_pos()
+
+        return abs(x1-x2) + abs(y1-y2)
+
+
+    # main
+    way = []
+    open = PriorityQueue()
+    closed = []
+    parents = {}
+
+    # Khởi tạo hàm chi phí ban đầu
+    g = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
+
+    # g_start = 1
+    # (f_n, (pos))
+    cur_start = start
+    g[start.get_pos()[0]][start.get_pos()[1]] = 1;
+    # Duyệt hết tất cả các điểm có trong danh mục điểm thưởng.
+    while not bonus.empty():
+        num_bonus, (x_cur, y_cur) = bonus.get()
+
+        print(num_bonus)
+
+        # Cách 1: Dùng góc nhọn + điểm cao nhất -> Thất bại
+        # Cách 2: Dùng các điểm trong phạm vi giới hạn trong hình nhật từ điểm hiện tại đến kết thúc
+            #Lọc ra những điểm nằm cùng phía -> Sắp xếp xa dần điểm đầu, sẽ có 2 nữa trên dưới với đường phân cách là đường chéo hcn đầu cuối
+            # Sẽ dùng h_n tính khoảng cách từ nó tới đính và khoảng cách từ nó tới điểm gần đó + gần đó tới đích + bonus -> Nếu chi phí rẻ hơn thì đi ko thì thôi.
+        # Sẽ tìm khoảng cách từ điểm hiện tại cho tới điểm thỏa mãn
+        if False:
+            open = PriorityQueue()
+
+            cur_end = grid[x_cur][y_cur]
+            open.put(( g[cur_start.get_pos()[0]][cur_start.get_pos()[1]] + heuristic_1(cur_start, cur_end), (cur_start.get_pos())))
+            while not open.empty():
+                f_prev, (x_cur, y_cur) = open.get()
+
+                if((x_cur, y_cur) == cur_end.get_pos()):
+                    cur_start = cur_end
+                    break
+                
+                if not grid[x_cur][y_cur].is_start():
+                    grid[x_cur][y_cur].make_open()
+
+                closed.append((x_cur, y_cur))
+                for neighbor in grid[x_cur][y_cur].neighbors:
+                    # WARNING!!!!!!!!
+                    x_new, y_new = neighbor.get_pos()
+                    if not (x_new, y_new) in closed:
+                        g_n = 1 + g[x_cur][y_cur]
+                        g[x_new][y_new] = g_n
+                        h_n = heuristic_1(neighbor, cur_end) 
+                        f_n = g_n + h_n
+                        open.put((f_n, (x_new, y_new)))
+
+                        parents[(x_new, y_new)] = (x_cur, y_cur)
+
+                clock.tick(FPS)
+                draw()
+
+    open = PriorityQueue()
+    open.put(( g[cur_start.get_pos()[0]][cur_start.get_pos()[1]] + heuristic_1(cur_start, end), (cur_start.get_pos())))
+    while not open.empty():
+        f_prev, (x_cur, y_cur) = open.get()
+
+        if(grid[x_cur][y_cur].is_end()):
+            print("Finally\n")
+            pos_start = start.get_pos()
+
+            child = end.get_pos()
+            parent = parents[child]
+            while(parent != pos_start):
+                way.append(parent)
+                child = parent
+                parent = parents[child]
+
+                    
+            print("Costs: ")
+            print(g[end.get_pos()[0]][end.get_pos()[1]])
+
+            reconstruct_path(way, grid, draw, clock)
+            return True
+        
+        if not grid[x_cur][y_cur].is_start():
+            grid[x_cur][y_cur].make_open()
+
+        closed.append((x_cur, y_cur))
+        for neighbor in grid[x_cur][y_cur].neighbors:
+            # WARNING!!!!!!!!
+            x_new, y_new = neighbor.get_pos()
+            if not (x_new, y_new) in closed:
+                g_n = 1 + g[x_cur][y_cur]
+                g[x_new][y_new] = g_n
+                h_n = heuristic_1(neighbor, end) 
+                f_n = g_n + h_n
+                open.put((f_n, (x_new, y_new)))
+
+                parents[(x_new, y_new)] = (x_cur, y_cur)
+        
+        clock.tick(FPS)
+        draw()
 
 
 
