@@ -1,12 +1,13 @@
 from contextlib import nullcontext
 from pickle import TRUE
+from queue import PriorityQueue
 import pygame, sys, os
 import pygame.camera
 from pygame.locals import *
 import math
 import random
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar
 from make_video import Video
 
 WIDTH = 800
@@ -181,7 +182,14 @@ def merge_maze_grid(maze, grid):
     return start, end
 
 def merge_bonus_grid(bonus_points, grid):
-    return
+    # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+    bonus_queue = PriorityQueue()
+
+    for point in bonus_points:
+        bonus_queue.put((point[2], (point[0], point[1])))
+        grid[point[0]][point[1]].make_bonus()
+
+    return bonus_queue
 
 def main(screen, maze, bonus_points, width, height):
     grid = make_grid(ROWS, COLS)
@@ -190,7 +198,7 @@ def main(screen, maze, bonus_points, width, height):
     end = None
 
     start, end = merge_maze_grid(maze, grid)
-    merge_bonus_grid(bonus_points, grid)
+    bonus_queue = merge_bonus_grid(bonus_points, grid)
 
     run = True
     while run:
@@ -206,9 +214,12 @@ def main(screen, maze, bonus_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
                     
+                    # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
                 #chua hieu lam
                 elif event.key == pygame.K_0 and start and end:
                     for row in grid:
@@ -233,7 +244,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_3.txt")
+bonus_points, maze = read_file("./maze/maze_4.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -253,5 +264,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_2_dfs")
+video.make_mp4("maze_4_a")
 video.destroy_png()
