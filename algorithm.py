@@ -47,6 +47,7 @@ def algorithm_dfs(draw, grid, start, end, clock):
             # print(f"Ways: {ways}")
             # In ra đường đi
             reconstruct_path(way, grid, draw, clock)
+            print("chi phi duong di la dfs: ", len(way))
             return True
 
         for neighbor in node.neighbors:
@@ -103,6 +104,7 @@ def algorithm_ucs(draw,grid,start,end,clock):
             # print(f"Ways: {ways}")
             # In ra đường đi
             reconstruct_path(way, grid, draw, clock)
+            print("chi phi duong di cua ucs: ", len(way))
             return True
         
         for neighbor in node.neighbors:
@@ -153,6 +155,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
                 parent = parents[child]
 
             reconstruct_path(way, grid, draw, clock)
+            print("chi phi duong di la cua bfs: " , len(way))
             return True
 
         for neighbor in node.neighbors:

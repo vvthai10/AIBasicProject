@@ -217,12 +217,12 @@ def main(screen, maze, bonus_points, width, height):
                     algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                 
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        # for row in grid:
-        #     for node in row:
-        #         node.update_neighbors(grid)
-        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # run = False
+        for row in grid:
+            for node in row:
+                node.update_neighbors(grid)
+        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        run = False
 
     
     
