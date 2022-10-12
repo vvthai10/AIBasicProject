@@ -115,19 +115,19 @@ class Node:
         self.neighbors = []
         if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_wall(): # DOWN
             self.neighbors.append(grid[self.row + 1][self.col])
-            self.costs[self.row + 1, self.col] = random.randint(1,30)
+            self.costs[self.row + 1, self.col] = 1#random.randint(1,30)
 
         if self.row > 0 and not grid[self.row - 1][self.col].is_wall(): # UP
             self.neighbors.append(grid[self.row - 1][self.col])
-            self.costs[(self.row - 1), self.col] = random.randint(1,30)
+            self.costs[(self.row - 1), self.col] =1 #random.randint(1,30)
 
         if self.col < self.total_cols - 1 and not grid[self.row][self.col + 1].is_wall(): # RIGHT
             self.neighbors.append(grid[self.row][self.col + 1])
-            self.costs[self.row, (self.col + 1)] = random.randint(1,30)
+            self.costs[self.row, (self.col + 1)] = 1#random.randint(1,30)
 
         if self.col > 0 and not grid[self.row][self.col - 1].is_wall(): # LEFT
             self.neighbors.append(grid[self.row][self.col - 1])
-            self.costs[self.row, (self.col-1)] = random.randint(1,30)
+            self.costs[self.row, (self.col-1)] = 1#random.randint(1,30)
     
     def __lt__(self, other):
         return False
