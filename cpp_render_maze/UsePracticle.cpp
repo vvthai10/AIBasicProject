@@ -88,6 +88,38 @@ Point CheckNeighbours(vector<vector<char>> maze, Point current)
     }
 }
 
+void GenerateBonus(vector<vector<char>>& maze, int bonus) {
+    int nRows = maze.size();
+    int nCols = maze[0].size();
+    vector<int> rows;
+    vector<int> cols;
+    vector<int> vBonus;
+
+    for (int i = 0; i < bonus; i++) {
+        int r = rand() % nRows;
+        int c = rand() % nCols;
+
+        while (maze[r][c] != ' ') {
+            r = rand() % nRows;
+            c = rand() % nCols;
+        }
+
+        if (maze[r][c] == ' ') {
+            maze[r][c] = '+';
+            rows.push_back(r);
+            cols.push_back(c);
+            int temp = -(rand() % 50 + 1);
+            vBonus.push_back(temp);
+        }
+    }
+
+    cout << bonus << endl;
+    for (int i = 0; i < bonus; i++) {
+        cout << rows[i] << " " << cols[i] << " " << vBonus[i] << endl;
+    }
+    PrintMaze(maze, nRows, nCols);
+}
+
 int main()
 {
     ios::sync_with_stdio(0);
@@ -97,8 +129,10 @@ int main()
 
     int rows, cols;
     // cin >> rows, cols;
-    rows = 15;
+    rows = 25;
     cols = 35;
+
+    int bonus = 12;
 
     Point end;
 
@@ -108,25 +142,25 @@ int main()
     int r, c;
     switch (chooseOut)
     {
-    // Trường hợp điểm đầu ra nằm trên cạnh trên
+        // Trường hợp điểm đầu ra nằm trên cạnh trên
     case 1:
         c = rand() % (cols - 1) + 1;
         end.r = 0;
         end.c = c;
         break;
-    // Trường hợp điểm ra nằm ở trên cạnh phải
+        // Trường hợp điểm ra nằm ở trên cạnh phải
     case 2:
         r = rand() % (rows - 1) + 1;
         end.r = r;
         end.c = cols - 1;
         break;
-    // Trường hợp điểm ra nằm ở cạnh dưới
+        // Trường hợp điểm ra nằm ở cạnh dưới
     case 3:
         c = rand() % (cols - 1) + 1;
         end.r = rows - 1;
         end.c = c;
         break;
-    // Trường hợp điểm ra nằm ở cạnh trái
+        // Trường hợp điểm ra nằm ở cạnh trái
     case 4:
         r = rand() % (rows - 1) + 1;
         end.r = r;
@@ -140,7 +174,7 @@ int main()
         maze[i].resize(cols, 'x');
     }
 
-    maze[end.r][end.c] = ' ';
+    maze[end.r][end.c] = 'E';
 
     // PrintMaze(maze, rows, cols);
 
@@ -187,8 +221,7 @@ int main()
         c = rand() % (cols - 2) + 1;
     }
 
-    maze[r][c] = 'S';
+    maze[r][c] = '*';
 
-    cout << "Successful.\n";
-    PrintMaze(maze, rows, cols);
+    GenerateBonus(maze, bonus);
 }

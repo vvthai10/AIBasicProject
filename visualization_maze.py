@@ -244,7 +244,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_4.txt")
+bonus_points, maze = read_file("./maze/maze_5.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
