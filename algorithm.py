@@ -231,17 +231,11 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
 
 def algorithm_astar(draw, grid, start, end, clock):
 
-    def heuristic_1(neighbor, end):
+    def euclid_dis(neighbor, end): #heuristic
         x1, y1 = neighbor.get_pos()
         x2, y2 = end.get_pos()
 
         return (x1 - x2) ** 2 + (y1 - y2) ** 2
-
-    def heuristic_2(neighbor, end):
-        x1, y1 = neighbor.get_pos()
-        x2, y2 = end.get_pos()
-
-        return abs(x1-x2) + abs(y1-y2)
 
 
     # main
@@ -255,7 +249,7 @@ def algorithm_astar(draw, grid, start, end, clock):
 
     # g_start = 1
     # (f_n, (pos))
-    open.put(( 1 + heuristic_1(start, end), (start.get_pos())))
+    open.put(( 1 + euclid_dis(start, end), (start.get_pos())))
 
     while not open.empty():
         f_prev, (x_cur, y_cur) = open.get()
@@ -283,7 +277,7 @@ def algorithm_astar(draw, grid, start, end, clock):
             x_new, y_new = neighbor.get_pos()
             if not (x_new, y_new) in closed:
                 g_n = 1 + g[x_cur][y_cur]
-                h_n = heuristic_1(neighbor, end) 
+                h_n = euclid_dis(neighbor, end) 
                 f_n = g_n + h_n
                 open.put((f_n, (x_new, y_new)))
 
