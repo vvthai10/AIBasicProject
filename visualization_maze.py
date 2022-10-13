@@ -220,20 +220,15 @@ def main(screen, maze, bonus_points, width, height):
                     # algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     # algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
-                #chua hieu lam
-                elif event.key == pygame.K_0 and start and end:
-                    for row in grid:
-                        for node in row:
-                            node.update_neighbors(grid)
-                    algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+
                 
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        # for row in grid:
-        #     for node in row:
-        #         node.update_neighbors(grid)
-        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # run = False
+        for row in grid:
+            for node in row:
+                node.update_neighbors(grid)
+        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        run = False
 
     
     
