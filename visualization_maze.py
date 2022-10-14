@@ -50,6 +50,9 @@ class Node:
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
+        # use for heatmap        
+        self.font = pygame.font.SysFont('Arial', 25) 
+
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -111,6 +114,15 @@ class Node:
         screen.blit(s, (self.x, self.y))
         # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
 
+    def draw_heapmap(self, screen):
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))
+        screen.blit(self.font.render('1.1', True, (255,0,0)), (200, 100))
+        # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+
     def update_neighbors(self, grid):
         self.neighbors = []
         if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_wall(): # DOWN
@@ -161,6 +173,18 @@ def draw(screen, grid, rows, cols, width, height):
 
     pygame.display.update()
 
+def draw_heatmap(screen, grid, rows, cols, width, height):
+    screen.fill(WHITE)
+    
+    for row in grid:
+        for node in row:
+            node.draw_heapmap(screen)
+    
+    draw_grid(screen, rows, cols, width, height)
+    video.make_png(screen)
+
+    pygame.display.update()
+
 def merge_maze_grid(maze, grid):
 
     start = None
@@ -192,6 +216,7 @@ def merge_bonus_grid(bonus_points, grid):
     return bonus_queue
 
 def main(screen, maze, bonus_points, width, height):
+    pygame.init() #heatmap related
     grid = make_grid(ROWS, COLS)
 
     start = None
@@ -202,7 +227,7 @@ def main(screen, maze, bonus_points, width, height):
 
     run = True
     while run:
-        draw(screen, grid, ROWS, COLS, width, height)
+        draw_heatmap(screen, grid, ROWS, COLS, width, height)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -239,7 +264,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_5.txt")
+bonus_points, maze = read_file("./maze/maze_2.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
