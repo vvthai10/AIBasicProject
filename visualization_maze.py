@@ -107,15 +107,24 @@ class Node:
     def make_path(self):
         self.color = PURPLE
         self.alpha = 255
-
+        
     def draw(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))        
+
+    def draw_heatmap(self, screen):
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
-        # write heat value
-        screen.blit(self.font.render('1.1', True, (0,0,0)), (self.x + SIZE/3, self.y + SIZE/3))        
+        # if not wall
+        if(self.color != BLACK):
+            screen.blit(self.font.render(str(self.heat_value), True, (0,0,0)),
+                        (self.x + self.size/3, self.y + self.size/3))        
 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -149,22 +158,41 @@ def make_grid(rows, cols):
 
     return grid
 
-def make_heat_grid(rows, cols, bonus_points):
-    # make blank grid
-    grid = []
-    for i in range(rows):
-        grid.append([])
-        for j in range(cols):
-            node = Node(i, j, SIZE, rows, cols)            
-            grid[i].append(node)
+def make_heat_grid(grid, bonus_queue):
+    def next_iter_heat_value (current_heat_value):
+        return current_heat_value/2
     # add bonus heat map
-    radius = 2
-    for point in bonus_points:
-        pos = point.get_pos()
-        point.bonus = point.bonus+1
-        for i in range(radius):
-            grid[pos[0]][pos[1]]
-    return grid
+    # spec
+    cancel_threshhold = 0.05
+    for point in bonus_queue:
+        point.heat_value = point[0]
+        # way = []
+        path = []
+        parents = {}
+
+        queue = []
+        queue.append(point)
+
+        while len(queue) != 0:
+            next_point = queue.pop(0)
+
+            if next_point in path:
+                continue
+
+            path.append(next_point)
+
+            node = grid[next_point[1]][next_point[2]]
+            if node != point:
+                node.make_open()
+
+            for neighbor in node.neighbors:
+                next_heat_val = next_iter_heat_value(next_point)
+                if(next_heat_val >= cancel_threshhold):
+                    neighbor.heat_value += next_heat_val 
+                # WARNING!!!!!!!!
+                if not neighbor.get_pos() in path:
+                    queue.append(neighbor)
+                    # parents[neighbor.get_pos()] = next_point
 
 def draw_grid(screen, rows, cols, width, height):
     for i in range(rows):
@@ -204,12 +232,22 @@ def merge_maze_grid(maze, grid):
     
     return start, end
 
+# def merge_bonus_grid(bonus_points, grid):
+#     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+#     bonus_queue = PriorityQueue()
+
+#     for point in bonus_points:
+#         bonus_queue.put((point[2], (point[0], point[1])))
+#         grid[point[0]][point[1]].make_bonus()
+
+#     return bonus_queue
+
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
-    bonus_queue = PriorityQueue()
+    bonus_queue = []
 
     for point in bonus_points:
-        bonus_queue.put((point[2], (point[0], point[1])))
+        bonus_queue.append((point[2], (point[0], point[1])))
         grid[point[0]][point[1]].make_bonus()
 
     return bonus_queue
@@ -222,7 +260,8 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-
+    make_heat_grid(grid,bonus_queue)
+    
     run = True
     while run:
         draw(screen, grid, ROWS, COLS, width, height)
