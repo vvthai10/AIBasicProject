@@ -17,7 +17,7 @@ FPS = 10
 RED = (255, 0, 0)
 GREEN = (144, 229, 150)
 BLUE = (158,219,227)
-YELLOW = (255, 255, 0)
+YELLOW = (255, 255, 0) #meaning?
 WHITE = (255, 255, 255)
 BLACK = (56, 55, 56)
 PURPLE = (175, 117, 173)
@@ -46,10 +46,14 @@ class Node:
         self.color = WHITE
         self.neighbors = []
         self.size = size
-        self.bonus = 0
+        self.bonus = 0 # what is this :I
         self.total_rows = total_rows
         self.total_cols = total_cols
-        self.alpha = 255
+        self.alpha = 255        
+        # heatmap related
+        self.heat_value = 0
+        pygame.init()
+        self.font = pygame.font.SysFont('Arial', 12)
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -87,6 +91,7 @@ class Node:
         self.color = GREEN
     
     # It use in A* ~ I don't sure.
+
     def make_closed(self):
         self.color = RED
 
@@ -109,7 +114,8 @@ class Node:
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
-        # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        # write heat value
+        screen.blit(self.font.render('1.1', True, (0,0,0)), (self.x + SIZE/3, self.y + SIZE/3))        
 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -141,6 +147,23 @@ def make_grid(rows, cols):
             
             grid[i].append(node)
 
+    return grid
+
+def make_heat_grid(rows, cols, bonus_points):
+    # make blank grid
+    grid = []
+    for i in range(rows):
+        grid.append([])
+        for j in range(cols):
+            node = Node(i, j, SIZE, rows, cols)            
+            grid[i].append(node)
+    # add bonus heat map
+    radius = 2
+    for point in bonus_points:
+        pos = point.get_pos()
+        point.bonus = point.bonus+1
+        for i in range(radius):
+            grid[pos[0]][pos[1]]
     return grid
 
 def draw_grid(screen, rows, cols, width, height):
@@ -239,7 +262,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_5.txt")
+bonus_points, maze = read_file("./maze/maze_2.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
