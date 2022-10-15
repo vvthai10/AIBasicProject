@@ -123,7 +123,7 @@ class Node:
         screen.blit(s, (self.x, self.y))
         # if not wall
         if(self.color != BLACK):
-            screen.blit(self.font.render(str(self.heat_value), True, (0,0,0)),
+            screen.blit(self.font.render(str(self.heat_value), True, (255,0,0)),
                         (self.x + self.size/3, self.y + self.size/3))        
 
     def update_neighbors(self, grid):
@@ -164,35 +164,35 @@ def make_heat_grid(grid, bonus_queue):
     # add bonus heat map
     # spec
     cancel_threshhold = 0.05
-    for point in bonus_queue:
-        point.heat_value = point[0]
+    while not bonus_queue.empty():
+        heat_val, point_pos = bonus_queue.get()
+        grid[point_pos[0]][point_pos[1]].heat_value += heat_val
         # way = []
-        path = []
+        closed = []
         parents = {}
 
         queue = []
-        queue.append(point)
+        queue.append(grid[point_pos[0]][point_pos[1]])
 
         while len(queue) != 0:
             next_point = queue.pop(0)
 
-            if next_point in path:
-                continue
+            if next_point in closed:
+                continue           
 
-            path.append(next_point)
+            # if next_point != grid[point_pos[0]][point_pos[1]]:
+            #     next_point.make_open()
 
-            node = grid[next_point[1]][next_point[2]]
-            if node != point:
-                node.make_open()
-
-            for neighbor in node.neighbors:
-                next_heat_val = next_iter_heat_value(next_point)
+            for neighbor in next_point.neighbors:
+                next_heat_val = next_iter_heat_value(heat_val)
                 if(next_heat_val >= cancel_threshhold):
                     neighbor.heat_value += next_heat_val 
                 # WARNING!!!!!!!!
-                if not neighbor.get_pos() in path:
+                if not neighbor.get_pos() in closed:
                     queue.append(neighbor)
                     # parents[neighbor.get_pos()] = next_point
+                    
+            closed.append(next_point)
 
 def draw_grid(screen, rows, cols, width, height):
     for i in range(rows):
@@ -206,6 +206,18 @@ def draw(screen, grid, rows, cols, width, height):
     for row in grid:
         for node in row:
             node.draw(screen)
+    
+    draw_grid(screen, rows, cols, width, height)
+    video.make_png(screen)
+
+    pygame.display.update()
+    
+def draw_heatmap(screen, grid, rows, cols, width, height):
+    screen.fill(WHITE)
+    
+    for row in grid:
+        for node in row:
+            node.draw_heatmap(screen)
     
     draw_grid(screen, rows, cols, width, height)
     video.make_png(screen)
@@ -244,10 +256,10 @@ def merge_maze_grid(maze, grid):
 
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
-    bonus_queue = []
+    bonus_queue = PriorityQueue()
 
     for point in bonus_points:
-        bonus_queue.append((point[2], (point[0], point[1])))
+        bonus_queue.put((point[2], (point[0], point[1])))
         grid[point[0]][point[1]].make_bonus()
 
     return bonus_queue
@@ -260,7 +272,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    make_heat_grid(grid,bonus_queue)
+    # make_heat_grid(grid,bonus_queue)
     
     run = True
     while run:
@@ -275,22 +287,20 @@ def main(screen, maze, bonus_points, width, height):
                     for row in grid:
                         for node in row:
                             node.update_neighbors(grid)
-                    
-                    # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
+                                       
+                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                if event.key == pygame.K_SPACE and start and end:
+                    run = False
+                   
 
                 
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        for row in grid:
-            for node in row:
-                node.update_neighbors(grid)
-        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        run = False
+        # for row in grid:
+        #     for node in row:
+        #         node.update_neighbors(grid)
+        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # run = False
 
     
     
@@ -321,5 +331,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_4_a")
+video.make_mp4("maze_2_a")
 video.destroy_png()
