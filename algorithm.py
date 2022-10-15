@@ -1,4 +1,5 @@
-from queue import PriorityQueue
+from queue import PriorityQueue, Queue
+import utility as util
 import math
 
 FPS = 5
@@ -170,13 +171,18 @@ def algorithm_bfs(draw, grid, start, end, clock):
 
     return False
 
-def algorithm_greedy_bfs(draw, grid, start, end, clock):
+def algorithm_greedy_bfs(draw, grid, start, end, clock, bonus_q = Queue()):
 
-    def heuristic_1(neighbor, end):
-        x1, y1 = neighbor.get_pos()
+    def heuristic_1(point, end):
+        x1, y1 = point.get_pos()
         x2, y2 = end.get_pos()
-
-        return (x1 - x2) ** 2 + (y1 - y2) ** 2 + neighbor.heat_value
+        return abs(x1 - x2) + abs(y1 - y2) + point.heat_value
+    
+    def q_search(point, bonus_queue):
+        for item in bonus_queue.queue:
+            if(point == item[1]):
+                return item[0] # return heat value
+        return 1
 
     way = []
     path = []
@@ -187,8 +193,7 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
     queue.put((heuristic_1(start, end), (start.get_pos())))
 
     while not queue.empty():
-        value_heuristic, (x_pos, y_pos) = queue.get()
-        
+        value_heuristic, (x_pos, y_pos) = queue.get()        
         pos = (x_pos, y_pos)
 
         if pos in path:
@@ -212,7 +217,10 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
 
             reconstruct_path(way, grid, draw, clock)
             return True
-
+        heat_value = q_search(node, bonus_q)
+        if heat_value != 1:
+            util.delete_heat(grid, node, heat_value)
+        
         for neighbor in node.neighbors:
             # WARNING!!!!!!!!
             if not neighbor.get_pos() in path:

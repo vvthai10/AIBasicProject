@@ -1,14 +1,13 @@
-from contextlib import nullcontext
 from pickle import TRUE
 from queue import PriorityQueue, Queue
-import pygame, sys, os
+import pygame
+import sys
 import pygame.camera
 from pygame.locals import *
-import math
-import random
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar
+import algorithm as algo 
 from make_video import Video
+import utility as util
 
 WIDTH = 800
 HEIGHT = 600
@@ -16,13 +15,13 @@ FPS = 10
 
 RED = (255, 0, 0)
 GREEN = (144, 229, 150)
-BLUE = (158,219,227)
-YELLOW = (255, 255, 0) #meaning?
+BLUE = (158, 219, 227)
+YELLOW = (255, 255, 0)  # meaning?
 WHITE = (255, 255, 255)
 BLACK = (56, 55, 56)
 PURPLE = (175, 117, 173)
-ORANGE = (234, 194 ,84)
-GREY = (126,126,121)
+ORANGE = (234, 194, 84)
+GREY = (126, 126, 121)
 TURQUOISE = (47, 66, 206)
 
 # Build all need to visualization
@@ -36,9 +35,11 @@ Description: Node is cell in matrix, it has another state with different color:
 - Purple: Correct way
 - Yellow: Bonus point
 """
+
+
 class Node:
     def __init__(self, row, col, size, total_rows, total_cols):
-        self.costs = {}   #cost from this node to near node
+        self.costs = {}  # cost from this node to near node
         self.row = row
         self.col = col
         self.x = col * size
@@ -46,10 +47,10 @@ class Node:
         self.color = WHITE
         self.neighbors = []
         self.size = size
-        self.bonus = 0 # what is this :I
+        self.bonus = 0  # what is this :I
         self.total_rows = total_rows
         self.total_cols = total_cols
-        self.alpha = 255        
+        self.alpha = 255
         # heatmap related
         self.heat_value = 0
         pygame.init()
@@ -68,7 +69,7 @@ class Node:
 
     def is_open(self):
         return self.color == GREEN
-    
+
     def is_wall(self):
         return self.color == BLACK
 
@@ -80,7 +81,7 @@ class Node:
 
     def is_bonus(self):
         return self.color == YELLOW
-    
+
     def reset(self):
         self.color = WHITE
 
@@ -89,7 +90,7 @@ class Node:
 
     def make_open(self):
         self.color = GREEN
-    
+
     # It use in A* ~ I don't sure.
 
     def make_closed(self):
@@ -103,18 +104,18 @@ class Node:
 
     def make_bonus(self):
         self.color = YELLOW
-    
+
     def make_path(self):
         self.color = PURPLE
         self.alpha = 255
-        
+
     def draw(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
-        screen.blit(s, (self.x, self.y))    
-        
+        screen.blit(s, (self.x, self.y))
+
     def draw_heatmap(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
@@ -122,30 +123,33 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
-        if(self.color != BLACK):               
-            screen.blit(self.font.render(str(round(self.heat_value, 3)), True, (0,0,0)),
-                        (self.x + self.size/3, self.y + self.size/3))        
+        if (self.color != BLACK):
+            screen.blit(self.font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
+                        (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
         self.neighbors = []
-        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_wall(): # DOWN
+        # DOWN
+        if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_wall():
             self.neighbors.append(grid[self.row + 1][self.col])
-            self.costs[self.row + 1, self.col] = 1#random.randint(1,30)
+            self.costs[self.row + 1, self.col] = 1  # random.randint(1,30)
 
-        if self.row > 0 and not grid[self.row - 1][self.col].is_wall(): # UP
+        if self.row > 0 and not grid[self.row - 1][self.col].is_wall():  # UP
             self.neighbors.append(grid[self.row - 1][self.col])
-            self.costs[(self.row - 1), self.col] =1 #random.randint(1,30)
+            self.costs[(self.row - 1), self.col] = 1  # random.randint(1,30)
 
-        if self.col < self.total_cols - 1 and not grid[self.row][self.col + 1].is_wall(): # RIGHT
+        # RIGHT
+        if self.col < self.total_cols - 1 and not grid[self.row][self.col + 1].is_wall():
             self.neighbors.append(grid[self.row][self.col + 1])
-            self.costs[self.row, (self.col + 1)] = 1#random.randint(1,30)
+            self.costs[self.row, (self.col + 1)] = 1  # random.randint(1,30)
 
-        if self.col > 0 and not grid[self.row][self.col - 1].is_wall(): # LEFT
+        if self.col > 0 and not grid[self.row][self.col - 1].is_wall():  # LEFT
             self.neighbors.append(grid[self.row][self.col - 1])
-            self.costs[self.row, (self.col-1)] = 1#random.randint(1,30)
-    
+            self.costs[self.row, (self.col-1)] = 1  # random.randint(1,30)
+
     def __lt__(self, other):
         return False
+
 
 def make_grid(rows, cols):
     grid = []
@@ -153,71 +157,45 @@ def make_grid(rows, cols):
         grid.append([])
         for j in range(cols):
             node = Node(i, j, SIZE, rows, cols)
-            
+
             grid[i].append(node)
 
     return grid
 
-def merge_heat_grid(grid, bonus_queue):
-    def next_iter_heat_value (current_heat_value):
-        return current_heat_value/2
+
+def merge_heat_grid(grid, bonus_queue):   
+    # clone bonus_q
+    tmpQ = Queue()    
+    for i in bonus_queue.queue: tmpQ.put(i)
     
-    # spec
-    cancel_threshhold = 0.05
-    
-    while not bonus_queue.empty():
-        (heat_val, point_pos) = bonus_queue.get()
+    while not tmpQ.empty():
+        (heat_val, point_pos) = tmpQ.get()
         point = grid[point_pos[0]][point_pos[1]]
-        point.heat_value += heat_val
-        closed = [] 
+        util.mark_heat_trace(grid,point,heat_val)
 
 
-        queue = Queue()
-        queue.put((heat_val, point))
-
-        while not queue.empty():
-            (delta_val, current_point) = queue.get()
-            if current_point in closed:
-                continue                       
-                                             
-            new_delta_val = next_iter_heat_value(delta_val)
-            
-            # if heat val is significant enough
-            if(abs(new_delta_val) >= abs(cancel_threshhold)):
-                current_point.update_neighbors(grid)   
-                for neighbor in current_point.neighbors:    
-                    #closed node won't gain heat val                                                                                         
-                    if not neighbor in closed:
-                        neighbor.heat_value += new_delta_val 
-                        queue.put((new_delta_val, neighbor))
-                        # parents[neighbor.get_pos()] = next_point
-                    
-            closed.append(current_point)
-
-def draw_grid(screen, rows, cols, width, height, heatmap = False):
+def draw_grid(screen, rows, cols, width, height):
     for i in range(rows):
         pygame.draw.line(screen, GREY, (0, i * SIZE), (width, i * SIZE))
         for j in range(cols):
             pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
-            if heatmap:
-                1
-            else:
-                pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
 
-def draw(screen, grid, rows, cols, width, height, heatmap = False):
+
+def draw(screen, grid, rows, cols, width, height, heatmap=False):
     screen.fill(WHITE)
-    
+
     for row in grid:
         for node in row:
-            if heatmap:                
+            if heatmap:
                 node.draw_heatmap(screen)
             else:
                 node.draw(screen)
-    
+
     draw_grid(screen, rows, cols, width, height)
     video.make_png(screen)
 
     pygame.display.update()
+
 
 def merge_maze_grid(maze, grid):
 
@@ -227,17 +205,18 @@ def merge_maze_grid(maze, grid):
     for i in range(ROWS):
         for j in range(COLS):
             node = grid[i][j]
-            if(maze[i][j] == 'S'):
+            if (maze[i][j] == 'S'):
                 start = node
                 start.make_start()
             elif maze[i][j] == ' ':
-                if (i==0) or (i==len(maze)-1) or (j==0) or (j==len(maze[0])-1):
+                if (i == 0) or (i == len(maze)-1) or (j == 0) or (j==len(maze[0])-1):
                     end = node
                     end.make_end()
             else:
                 node.make_wall()
-    
+
     return start, end
+
 
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
@@ -249,20 +228,34 @@ def merge_bonus_grid(bonus_points, grid):
 
     return bonus_queue
 
+
 def main(screen, maze, bonus_points, width, height):
+    def wait():
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()                    
+                if event.type == KEYDOWN and event.key == K_SPACE:
+                    return 
+                
     grid = make_grid(ROWS, COLS)
 
     start = None
     end = None
     include_heatmap = True
-    
+
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    merge_heat_grid(grid,bonus_queue)
-    
+    merge_heat_grid(grid, bonus_queue)
+        
+        
+    # draw once and wait for input (KEY space)
+    # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
+    # wait()
     run = True
     while run:
-        draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
+        draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -273,13 +266,13 @@ def main(screen, maze, bonus_points, width, height):
                     for row in grid:
                         for node in row:
                             node.update_neighbors(grid)
-                                       
-                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, start, end, clock)
+
+                    algo.algorithm_greedy_bfs(lambda: draw(
+                        screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, start, end, clock)
                 # if event.key == pygame.K_SPACE and start and end:
                 #     run = False
-                   
 
-                
+
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
         # for row in grid:
         #     for node in row:
@@ -288,16 +281,14 @@ def main(screen, maze, bonus_points, width, height):
         # # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
         # run = False
 
-    
-    
     pygame.quit()
 
-    
+
 """
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_4.txt")
+bonus_points, maze = read_file("./maze/maze_2.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
