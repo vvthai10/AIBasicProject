@@ -193,7 +193,6 @@ def make_heat_grid(grid, bonus_queue):
                         # parents[neighbor.get_pos()] = next_point
                     
             closed.append(current_point)
-    return grid
 
 def draw_grid(screen, rows, cols, width, height):
     for i in range(rows):
@@ -273,7 +272,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    grid = make_heat_grid(grid,bonus_queue)
+    make_heat_grid(grid,bonus_queue)
     
     run = True
     while run:
@@ -312,7 +311,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_2.txt")
+bonus_points, maze = read_file("./maze/maze_4.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -332,5 +331,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_2_a")
+video.make_mp4("maze_2_a_nonedit")
 video.destroy_png()
