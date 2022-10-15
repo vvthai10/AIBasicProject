@@ -123,7 +123,7 @@ class Node:
         screen.blit(s, (self.x, self.y))
         # if not wall
         if(self.color != BLACK):               
-            screen.blit(self.font.render(str(self.heat_value), True, (0,0,0)),
+            screen.blit(self.font.render(str(round(self.heat_value, 3)), True, (0,0,0)),
                         (self.x + self.size/3, self.y + self.size/3))        
 
     def update_neighbors(self, grid):
@@ -158,7 +158,7 @@ def make_grid(rows, cols):
 
     return grid
 
-def make_heat_grid(grid, bonus_queue):
+def merge_heat_grid(grid, bonus_queue):
     def next_iter_heat_value (current_heat_value):
         return current_heat_value/2
     
@@ -194,30 +194,25 @@ def make_heat_grid(grid, bonus_queue):
                     
             closed.append(current_point)
 
-def draw_grid(screen, rows, cols, width, height):
+def draw_grid(screen, rows, cols, width, height, heatmap = False):
     for i in range(rows):
         pygame.draw.line(screen, GREY, (0, i * SIZE), (width, i * SIZE))
         for j in range(cols):
             pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
+            if heatmap:
+                1
+            else:
+                pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
 
-def draw(screen, grid, rows, cols, width, height):
+def draw(screen, grid, rows, cols, width, height, heatmap = False):
     screen.fill(WHITE)
     
     for row in grid:
         for node in row:
-            node.draw(screen)
-    
-    draw_grid(screen, rows, cols, width, height)
-    video.make_png(screen)
-
-    pygame.display.update()
-    
-def draw_heatmap(screen, grid, rows, cols, width, height):
-    screen.fill(WHITE)
-    
-    for row in grid:
-        for node in row:
-            node.draw_heatmap(screen)
+            if heatmap:                
+                node.draw_heatmap(screen)
+            else:
+                node.draw(screen)
     
     draw_grid(screen, rows, cols, width, height)
     video.make_png(screen)
@@ -244,16 +239,6 @@ def merge_maze_grid(maze, grid):
     
     return start, end
 
-# def merge_bonus_grid(bonus_points, grid):
-#     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
-#     bonus_queue = PriorityQueue()
-
-#     for point in bonus_points:
-#         bonus_queue.put((point[2], (point[0], point[1])))
-#         grid[point[0]][point[1]].make_bonus()
-
-#     return bonus_queue
-
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
     bonus_queue = PriorityQueue()
@@ -269,14 +254,15 @@ def main(screen, maze, bonus_points, width, height):
 
     start = None
     end = None
-
+    include_heatmap = True
+    
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    make_heat_grid(grid,bonus_queue)
+    merge_heat_grid(grid,bonus_queue)
     
     run = True
     while run:
-        draw_heatmap(screen, grid, ROWS, COLS, width, height)
+        draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -288,9 +274,9 @@ def main(screen, maze, bonus_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
                                        
-                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                if event.key == pygame.K_SPACE and start and end:
-                    run = False
+                    algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, start, end, clock)
+                # if event.key == pygame.K_SPACE and start and end:
+                #     run = False
                    
 
                 

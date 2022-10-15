@@ -176,13 +176,7 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
         x1, y1 = neighbor.get_pos()
         x2, y2 = end.get_pos()
 
-        return (x1 - x2) ** 2 + (y1 - y2) ** 2
-
-    def heuristic_2(neighbor, end):
-        x1, y1 = neighbor.get_pos()
-        x2, y2 = end.get_pos()
-
-        return abs(x1-x2) + abs(y1-y2)
+        return (x1 - x2) ** 2 + (y1 - y2) ** 2 + neighbor.heat_value
 
     way = []
     path = []

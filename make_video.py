@@ -8,10 +8,8 @@ FPS = 15
 
 class Video:
  
-    def __init__(self,size):
-        # self.path = os.path.dirname(__file__) + "\image"
+    def __init__(self,size):    
         self.path = PATH_IMAGES
-        # print(self.path)
         self.name = "image"
         self.cnt = 0
  
@@ -23,8 +21,7 @@ class Video:
     
     def make_png(self,screen):
         self.cnt+=1
-        fullpath = self.path + self.name + "%08d.png" % self.cnt
-        # print(fullpath)
+        fullpath = self.path + self.name + "%08d.png" % self.cnt        
         pygame.image.save(screen,fullpath)
  
     def make_mp4(self, name):
