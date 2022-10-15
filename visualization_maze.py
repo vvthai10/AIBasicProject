@@ -1,6 +1,6 @@
 from contextlib import nullcontext
 from pickle import TRUE
-from queue import PriorityQueue
+from queue import PriorityQueue, Queue
 import pygame, sys, os
 import pygame.camera
 from pygame.locals import *
@@ -113,8 +113,8 @@ class Node:
         s = pygame.Surface((self.size, self.size))  # the size of your rect
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
-        screen.blit(s, (self.x, self.y))        
-
+        screen.blit(s, (self.x, self.y))    
+        
     def draw_heatmap(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
@@ -122,8 +122,8 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
-        if(self.color != BLACK):
-            screen.blit(self.font.render(str(self.heat_value), True, (255,0,0)),
+        if(self.color != BLACK):               
+            screen.blit(self.font.render(str(self.heat_value), True, (0,0,0)),
                         (self.x + self.size/3, self.y + self.size/3))        
 
     def update_neighbors(self, grid):
@@ -161,38 +161,39 @@ def make_grid(rows, cols):
 def make_heat_grid(grid, bonus_queue):
     def next_iter_heat_value (current_heat_value):
         return current_heat_value/2
-    # add bonus heat map
+    
     # spec
     cancel_threshhold = 0.05
+    
     while not bonus_queue.empty():
-        heat_val, point_pos = bonus_queue.get()
-        grid[point_pos[0]][point_pos[1]].heat_value += heat_val
-        # way = []
-        closed = []
-        parents = {}
+        (heat_val, point_pos) = bonus_queue.get()
+        point = grid[point_pos[0]][point_pos[1]]
+        point.heat_value += heat_val
+        closed = [] 
 
-        queue = []
-        queue.append(grid[point_pos[0]][point_pos[1]])
 
-        while len(queue) != 0:
-            next_point = queue.pop(0)
+        queue = Queue()
+        queue.put((heat_val, point))
 
-            if next_point in closed:
-                continue           
-
-            # if next_point != grid[point_pos[0]][point_pos[1]]:
-            #     next_point.make_open()
-
-            for neighbor in next_point.neighbors:
-                next_heat_val = next_iter_heat_value(heat_val)
-                if(next_heat_val >= cancel_threshhold):
-                    neighbor.heat_value += next_heat_val 
-                # WARNING!!!!!!!!
-                if not neighbor.get_pos() in closed:
-                    queue.append(neighbor)
-                    # parents[neighbor.get_pos()] = next_point
+        while not queue.empty():
+            (delta_val, current_point) = queue.get()
+            if current_point in closed:
+                continue                       
+                                             
+            new_delta_val = next_iter_heat_value(delta_val)
+            
+            # if heat val is significant enough
+            if(abs(new_delta_val) >= abs(cancel_threshhold)):
+                current_point.update_neighbors(grid)   
+                for neighbor in current_point.neighbors:    
+                    #closed node won't gain heat val                                                                                         
+                    if not neighbor in closed:
+                        neighbor.heat_value += new_delta_val 
+                        queue.put((new_delta_val, neighbor))
+                        # parents[neighbor.get_pos()] = next_point
                     
-            closed.append(next_point)
+            closed.append(current_point)
+    return grid
 
 def draw_grid(screen, rows, cols, width, height):
     for i in range(rows):
@@ -272,11 +273,11 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    # make_heat_grid(grid,bonus_queue)
+    grid = make_heat_grid(grid,bonus_queue)
     
     run = True
     while run:
-        draw(screen, grid, ROWS, COLS, width, height)
+        draw_heatmap(screen, grid, ROWS, COLS, width, height)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
