@@ -282,7 +282,7 @@ def main(screen, maze, bonus_points, width, height):
 """
 Start simulation
 """
-maze_name = '4'
+maze_name = '7'
 bonus_points, maze = read_file("./maze/maze_"+ maze_name + ".txt")
 
 ROWS = len(maze)
@@ -299,7 +299,7 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 video = Video((WIDTH, HEIGHT))
 pygame.display.set_caption("Simulation of finding the way")
 clock = pygame.time.Clock()
-
+video.destroy_png()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.

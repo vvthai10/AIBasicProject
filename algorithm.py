@@ -306,18 +306,18 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
     def h_x(point):
         return util.distance(point, end) 
     
-    def g_x(point, center):
-        return (point.heat_value) + util.distance(point, center) / 3
+    def g_x(point):
+        return (point.heat_value)
     
-    def heuristic(target, center):
-        return h_x(target) + g_x(target, center)
+    def heuristic(target):
+        return h_x(target) + g_x(target)
     
-    def check_parent(leaf_node, node_to_check, parent_list, pos_root = start.get_pos()):        
+    def check_parent(leaf_node, node_to_check, parent_list, pos_root):        
         child = leaf_node.get_pos()
         parent = parent_list.get(child)
         if not parent:
             return False    
-        while parent != pos_root:
+        while parent != pos_root:            
             if parent == node_to_check.get_pos():
                 return True
             child = parent
@@ -328,38 +328,65 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
     open = PriorityQueue()   # contain nodes (f_n, node)
     closed = []              # contain nodes  
     parents = {}             # contain positions
-    row = len(grid)
-    col = len(grid[0])
-    center = grid[int(row/2)][int(col/2)]
-    open.put((heuristic(start, center), start))
+    # row = len(grid)
+    # col = len(grid[0])
+    # center = grid[int(row/2)][int(col/2)]
+    checkpoint_pos = start.get_pos()    
+    open.put((heuristic(start), start))
     # print(bonus_queue.queue)   experimental
 
     while not open.empty():        
         value_heuristic, node = open.get()    
-        pos = node.get_pos()
-                                      
+        pos = node.get_pos()        
         if pos == end.get_pos(): # reach the end
-            pos_start = start.get_pos()
-            child = end.get_pos()
+            tmp_way = [pos]
+            child = node.get_pos()
             parent = parents[child]
-            while(parent != pos_start):
-                way.append(parent)
+            while parent != checkpoint_pos:
+                tmp_way.append(parent)
                 child = parent
-                parent = parents[child]
+                parent = parents[child]            
+            tmp_way.append(checkpoint_pos)
+            tmp_way.reverse()
+            way = way + tmp_way
             reconstruct_path(way, grid, draw, clock)
             return True
-        elif node != start: # not reach the end
+        elif node != start:
             node.make_open()
         
         # check if reach bonus point        
         if node.bonus < 0:
-            bonus_queue.get(node)            
+            # delete node from bonus queue
+            bonus_queue.get(node)         
+            # re-draw heat grid   
             util.update_heat_grid(grid,bonus_queue)
-        
+
+            # find this part of the way
+            tmp_way = []
+            child = node.get_pos()
+            parent = parents.get(child)
+            if parent: # if run reverse
+                while parent != checkpoint_pos:
+                    tmp_way.append(parent)
+                    child = parent
+                    parent = parents[child]            
+                tmp_way.append(checkpoint_pos)
+                tmp_way.reverse()
+
+            # add tmp_way to way
+            way = way + tmp_way
+            # update checkpoint
+            checkpoint_pos = node.get_pos()
+            # reset queues
+            parents.clear()
+            open = PriorityQueue()
+            open.put((heuristic(node), node))
+            
+
         # open new node
         for neighbor in node.neighbors:           
-            if not check_parent(node, neighbor, parent_list= parents):
-                value = heuristic(neighbor, center) 
+            if not check_parent(node, neighbor, parents, checkpoint_pos):
+                value = heuristic(neighbor) 
                 open.put((value, neighbor))
                 parents[neighbor.get_pos()] = pos
                     
