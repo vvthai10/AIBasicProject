@@ -1,4 +1,5 @@
 from dis import dis
+from http.client import FOUND
 from queue import PriorityQueue, Queue
 import utility as util
 import math
@@ -302,12 +303,17 @@ def algorithm_astar(draw, grid, start, end, clock):
 # Sẽ tìm khoảng cách từ điểm hiện tại cho tới điểm thỏa mãn
 
 
-def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):    
+def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):    
     def h_x(point):
         return util.distance(point, end) 
     
-    def g_x(point):
-        return (point.heat_value)
+    def g_x(point, bonus_list = bonus_list):
+        if (point.bonus < 0 
+                and (point.y/util.SIZE, point.x/util.SIZE, point.bonus) in bonus_list):
+            print("FOUND")
+            return point.heat_value + point.bonus * 10 # edit thiss
+        else:
+            return point.heat_value
     
     def heuristic(target):
         return h_x(target) + g_x(target)
@@ -337,6 +343,7 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
 
     while not open.empty():        
         value_heuristic, node = open.get()    
+        print(value_heuristic)
         pos = node.get_pos()        
         if pos == end.get_pos(): # reach the end
             tmp_way = [pos]
@@ -353,19 +360,19 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
             return True
         elif node != start:
             node.make_open()
-        
+                
         # check if reach bonus point        
-        if node.bonus < 0:
-            # delete node from bonus queue
-            bonus_queue.get(node)         
-            # re-draw heat grid   
-            util.update_heat_grid(grid,bonus_queue)
+        if node.bonus < 0:                        
+            # delete node from bonus queue            
+            bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
+            # re-draw heat grid               
+            util.update_heat_grid(grid,bonus_list)
 
             # find this part of the way
             tmp_way = []
             child = node.get_pos()
             parent = parents.get(child)
-            if parent: # if run reverse
+            if parent: # if not run reverse
                 while parent != checkpoint_pos:
                     tmp_way.append(parent)
                     child = parent

@@ -242,8 +242,8 @@ def main(screen, maze, bonus_points, width, height):
     include_heatmap = True
 
     start, end = merge_maze_grid(maze, grid)
-    bonus_queue = merge_bonus_grid(bonus_points, grid)
-    util.update_heat_grid(grid, bonus_queue)
+    merge_bonus_grid(bonus_points, grid)
+    util.update_heat_grid(grid, bonus_points)
         
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
@@ -263,7 +263,7 @@ def main(screen, maze, bonus_points, width, height):
                             node.update_neighbors(grid)
 
                     algo.algorithm_bonus_astar(lambda: draw(
-                        screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, bonus_queue, start, end, clock)
+                        screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, bonus_points, start, end, clock)
                 # if event.key == pygame.K_SPACE and start and end:
                 #      run = False
 
@@ -282,7 +282,7 @@ def main(screen, maze, bonus_points, width, height):
 """
 Start simulation
 """
-maze_name = '7'
+maze_name = '5'
 bonus_points, maze = read_file("./maze/maze_"+ maze_name + ".txt")
 
 ROWS = len(maze)

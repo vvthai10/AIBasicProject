@@ -12,7 +12,7 @@ def update_heat(point, config):
     point.heat_value = min(config, point.heat_value)
     
 def minimal_congif(config):
-    cancel_threshhold = 0.5
+    cancel_threshhold = 0
     if(abs(config) >= abs(cancel_threshhold)):
         return False
     else:
@@ -57,10 +57,9 @@ def max_heat(grid):
             ans = max(ans, abs(node.heat_value))
     return ans
 
-def update_heat_grid(grid, bonus_queue):   
-    # clone bonus_queue
-    tmpQ = Queue()    
-    for i in bonus_queue.queue: tmpQ.put(i)
+def update_heat_grid(grid, bonus_list):   
+    # clone bonus_list
+    tmpQ = bonus_list.copy()    
     
     #reset heat grid
     for row in grid:
@@ -68,7 +67,8 @@ def update_heat_grid(grid, bonus_queue):
             node.heat_value = 0    
             
     #mark new heat sources
-    while not tmpQ.empty():
-        (heat_val, pos) = tmpQ.get()
-        point = grid[pos[0]][pos[1]]
+    while len(tmpQ) != 0:
+        pos_x, pos_y, heat_val = tmpQ[0]
+        tmpQ.pop(0)
+        point = grid[pos_x][pos_y]
         mark_heat_trace(grid,point,heat_val)
