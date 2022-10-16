@@ -47,12 +47,12 @@ class Node:
         self.color = WHITE
         self.neighbors = []
         self.size = size
-        self.bonus = 0  # what is this :I
+        self.bonus = 0  # always negative or 0
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
         # heatmap related
-        self.heat_value = 0
+        self.heat_value = 0 # alway negative
         pygame.init()
         self.font = pygame.font.SysFont('Arial', 12)
 
@@ -163,17 +163,6 @@ def make_grid(rows, cols):
     return grid
 
 
-def merge_heat_grid(grid, bonus_queue):   
-    # clone bonus_queue
-    tmpQ = Queue()    
-    for i in bonus_queue: tmpQ.put(i)
-   
-    while not tmpQ.empty():
-        (pos_x, pos_y, heat_val) = tmpQ.get()
-        point = grid[pos_x][pos_y]
-        util.mark_heat_trace(grid,point,heat_val)
-
-
 def draw_grid(screen, rows, cols, width, height):
     for i in range(rows):
         pygame.draw.line(screen, GREY, (0, i * SIZE), (width, i * SIZE))
@@ -182,18 +171,16 @@ def draw_grid(screen, rows, cols, width, height):
 
 
 def draw(screen, grid, rows, cols, width, height, heatmap=False):
-    def new_color(base_color = WHITE, target_color = ORANGE, ratio = 0):
-        1
-    def update_heat_gradient(grid, max_heat, base_color = WHITE, target_color = ORANGE):        
-        for row in grid:
-            for node in row:
-                if node.color == WHITE and node.heat_value != 0:
-                    ratio = abs(node.heat_value / max_heat)                                                  
-                    new_color = []                    
-                    for i in range(3):                        
-                        calculation = float(target_color[i] - base_color[i]) * ratio + float(base_color[i])
-                        new_color.append(int(calculation))
-                        print(calculation)
+    # def update_heat_gradient(grid, max_heat, base_color = WHITE, target_color = WHITE):        
+    #     for row in grid:
+    #         for node in row:
+    #             if node.color == WHITE and node.heat_value != 0:
+    #                 ratio = abs(node.heat_value / max_heat)                                                  
+    #                 new_color = []                    
+    #                 for i in range(3):                        
+    #                     calculation = float(target_color[i] - base_color[i]) * ratio + float(base_color[i])
+    #                     new_color.append(int(calculation))
+    #                 node.color = new_color
                                 
     screen.fill(WHITE)
 
@@ -201,7 +188,7 @@ def draw(screen, grid, rows, cols, width, height, heatmap=False):
         for node in row:
             if heatmap:
                 max_heat = util.max_heat(grid)                   
-                update_heat_gradient(grid, max_heat, ORANGE)             
+                # update_heat_gradient(grid, max_heat)             
                 node.draw_heatmap(screen)
             else:
                 node.draw(screen)
@@ -239,6 +226,7 @@ def merge_bonus_grid(bonus_points, grid):
 
     for point in bonus_points:
         bonus_queue.put((point[2], (point[0], point[1])))
+        grid[point[0]][point[1]].bonus = point[2]
         grid[point[0]][point[1]].make_bonus()
 
     return bonus_queue
@@ -254,7 +242,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    merge_heat_grid(grid, bonus_points)
+    util.update_heat_grid(grid, bonus_queue)
         
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
@@ -293,8 +281,8 @@ def main(screen, maze, bonus_points, width, height):
 """
 Start simulation
 """
-
-bonus_points, maze = read_file("./maze/maze_2.txt")
+maze_name = '4'
+bonus_points, maze = read_file("./maze/maze_"+ maze_name + ".txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -314,5 +302,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_2_heat")
+video.make_mp4("maze_" + maze_name + "_heat")
 video.destroy_png()
