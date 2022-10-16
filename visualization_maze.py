@@ -8,6 +8,7 @@ from handle_file_maze import read_file
 import algorithm as algo 
 from make_video import Video
 import utility as util
+from utility import SIZE as SIZE
 
 WIDTH = 800
 HEIGHT = 600
@@ -287,7 +288,7 @@ bonus_points, maze = read_file("./maze/maze_"+ maze_name + ".txt")
 ROWS = len(maze)
 COLS = len(maze[0])
 
-SIZE = 32
+
 
 WIDTH = COLS * SIZE
 HEIGHT = ROWS * SIZE

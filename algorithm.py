@@ -306,11 +306,11 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
     def h_x(point):
         return util.distance(point, end) 
     
-    def g_x(point):
-        return 3 * (point.heat_value)
+    def g_x(point, center):
+        return (point.heat_value) + util.distance(point, center) / 3
     
-    def heuristic(target):
-        return h_x(target) + g_x(target)
+    def heuristic(target, center):
+        return h_x(target) + g_x(target, center)
     
     def check_parent(leaf_node, node_to_check, parent_list, pos_root = start.get_pos()):        
         child = leaf_node.get_pos()
@@ -328,14 +328,14 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
     open = PriorityQueue()   # contain nodes (f_n, node)
     closed = []              # contain nodes  
     parents = {}             # contain positions
-        
-    open.put((heuristic(start), start))
+    row = len(grid)
+    col = len(grid[0])
+    center = grid[int(row/2)][int(col/2)]
+    open.put((heuristic(start, center), start))
     # print(bonus_queue.queue)   experimental
 
     while not open.empty():        
         value_heuristic, node = open.get()    
-        print(value_heuristic)    
-        print('distance:', util.distance(node, end) )
         pos = node.get_pos()
                                       
         if pos == end.get_pos(): # reach the end
@@ -359,7 +359,7 @@ def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):
         # open new node
         for neighbor in node.neighbors:           
             if not check_parent(node, neighbor, parent_list= parents):
-                value = heuristic(neighbor) 
+                value = heuristic(neighbor, center) 
                 open.put((value, neighbor))
                 parents[neighbor.get_pos()] = pos
                     

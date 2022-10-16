@@ -1,11 +1,12 @@
 import math
 from queue import Queue
 
+SIZE = 32
 # config: heat_value 
 
 def next_gen_heat(current_config):
     heat_value = current_config
-    return heat_value + 5
+    return heat_value + 1
 
 def update_heat(point, config):
     point.heat_value = min(config, point.heat_value)
@@ -43,18 +44,11 @@ def mark_heat_trace(grid, heat_source, heat_val):
 
         closed.append(current_point)
 
-
-def queue_search(point, bonus_queue): #not use
-    for item in bonus_queue.queue:
-        if (point.get_pos() == item[1]):
-            return item[0]  # return heat value
-    return 1
-
 def sigmoid(x):
     return 1/(1+math.exp(-x))
 
-def distance(a, b, SIZE = 32):
-    return math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2)/SIZE
+def distance(a, b, rect_size = SIZE):
+    return math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2)/rect_size
 
 def max_heat(grid):
     ans = 0
