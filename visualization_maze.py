@@ -7,7 +7,7 @@ from pygame.locals import *
 import math
 import random
 from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar, algorithm_bonus_pickup_astar
 from make_video import Video
 
 WIDTH = 800
@@ -16,7 +16,7 @@ FPS = 10
 
 RED = (255, 0, 0)
 GREEN = (144, 229, 150)
-BLUE = (158,219,227)
+BLUE = (51, 143, 165)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (56, 55, 56)
@@ -77,6 +77,9 @@ class Node:
     def is_bonus(self):
         return self.color == YELLOW
     
+    def is_pickups(self):
+        return self.color == BLUE
+
     def reset(self):
         self.color = WHITE
 
@@ -98,6 +101,9 @@ class Node:
 
     def make_bonus(self):
         self.color = YELLOW
+
+    def make_pickups(self):
+        self.color = BLUE
     
     def make_path(self):
         self.color = PURPLE
@@ -169,7 +175,7 @@ def merge_maze_grid(maze, grid):
     for i in range(ROWS):
         for j in range(COLS):
             node = grid[i][j]
-            if(maze[i][j] == 'S'):
+            if(maze[i][j] == 'S' or maze[i][j] == '*'):
                 start = node
                 start.make_start()
             elif maze[i][j] == ' ':
@@ -184,14 +190,26 @@ def merge_maze_grid(maze, grid):
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
     bonus_queue = PriorityQueue()
-
+    i = 0
     for point in bonus_points:
         bonus_queue.put((point[2], (point[0], point[1])))
         grid[point[0]][point[1]].make_bonus()
-
+        i += 1
+    
+    print(i)
     return bonus_queue
 
-def main(screen, maze, bonus_points, width, height):
+def merge_pickups_grid(pickup_points, grid):
+    # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+    pickups_queue = PriorityQueue()
+
+    for point in pickup_points:
+        pickups_queue.put(((point[0], point[1])))
+        grid[point[0]][point[1]].make_pickups()
+
+    return pickups_queue
+
+def main(screen, maze, bonus_points, pickup_points, width, height):
     grid = make_grid(ROWS, COLS)
 
     start = None
@@ -199,6 +217,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
+    pickups_queue = merge_pickups_grid(pickup_points, grid)
 
     run = True
     while run:
@@ -214,21 +233,23 @@ def main(screen, maze, bonus_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
                     
-                    # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
+                    # check = algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # check = algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # check = algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # check = algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    # check = algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+                    check = algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
+                    # check = algorithm_bonus_pickup_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, pickups_queue, start, end, clock)
+                    print(check)
 
                 
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        for row in grid:
-            for node in row:
-                node.update_neighbors(grid)
-        algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
+        # for row in grid:
+        #     for node in row:
+        #         node.update_neighbors(grid)
+        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
         # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        run = False
+        # run = False
 
     
     
@@ -239,7 +260,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 
-bonus_points, maze = read_file("./maze/maze_5.txt")
+maze, bonus_points, pickup_points = read_file("./maze/maze_6.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -249,15 +270,13 @@ SIZE = 32
 WIDTH = COLS * SIZE
 HEIGHT = ROWS * SIZE
 
-print(WIDTH, HEIGHT)
-
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 video = Video((WIDTH, HEIGHT))
 pygame.display.set_caption("Simulation of finding the way")
 clock = pygame.time.Clock()
 
-main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
+# main(SCREEN, maze, bonus_points, pickup_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_4_a")
+# video.make_mp4("maze_7")
 video.destroy_png()
