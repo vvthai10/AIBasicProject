@@ -116,10 +116,10 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
 
-    def draw_heatmap(self, screen):
+    def draw_heatmap(self, screen):                      
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
-        s.set_alpha(self.alpha)                # alpha level
+        s.set_alpha(self.alpha)                # alpha level       
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
@@ -164,13 +164,13 @@ def make_grid(rows, cols):
 
 
 def merge_heat_grid(grid, bonus_queue):   
-    # clone bonus_q
+    # clone bonus_queue
     tmpQ = Queue()    
-    for i in bonus_queue.queue: tmpQ.put(i)
-    
+    for i in bonus_queue: tmpQ.put(i)
+   
     while not tmpQ.empty():
-        (heat_val, point_pos) = tmpQ.get()
-        point = grid[point_pos[0]][point_pos[1]]
+        (pos_x, pos_y, heat_val) = tmpQ.get()
+        point = grid[pos_x][pos_y]
         util.mark_heat_trace(grid,point,heat_val)
 
 
@@ -182,11 +182,26 @@ def draw_grid(screen, rows, cols, width, height):
 
 
 def draw(screen, grid, rows, cols, width, height, heatmap=False):
+    def new_color(base_color = WHITE, target_color = ORANGE, ratio = 0):
+        1
+    def update_heat_gradient(grid, max_heat, base_color = WHITE, target_color = ORANGE):        
+        for row in grid:
+            for node in row:
+                if node.color == WHITE and node.heat_value != 0:
+                    ratio = abs(node.heat_value / max_heat)                                                  
+                    new_color = []                    
+                    for i in range(3):                        
+                        calculation = float(target_color[i] - base_color[i]) * ratio + float(base_color[i])
+                        new_color.append(int(calculation))
+                        print(calculation)
+                                
     screen.fill(WHITE)
 
     for row in grid:
         for node in row:
             if heatmap:
+                max_heat = util.max_heat(grid)                   
+                update_heat_gradient(grid, max_heat, ORANGE)             
                 node.draw_heatmap(screen)
             else:
                 node.draw(screen)
@@ -229,15 +244,7 @@ def merge_bonus_grid(bonus_points, grid):
     return bonus_queue
 
 
-def main(screen, maze, bonus_points, width, height):
-    def wait():
-        while True:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()                    
-                if event.type == KEYDOWN and event.key == K_SPACE:
-                    return 
+def main(screen, maze, bonus_points, width, height):    
                 
     grid = make_grid(ROWS, COLS)
 
@@ -247,13 +254,12 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     bonus_queue = merge_bonus_grid(bonus_points, grid)
-    merge_heat_grid(grid, bonus_queue)
-        
+    merge_heat_grid(grid, bonus_points)
         
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
-    # wait()
-    run = True
+    # wait()  
+    run = True  
     while run:
         draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)        
         for event in pygame.event.get():
@@ -267,10 +273,10 @@ def main(screen, maze, bonus_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
 
-                    algo.algorithm_greedy_bfs(lambda: draw(
-                        screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, start, end, clock)
+                    algo.algorithm_bonus_astar(lambda: draw(
+                        screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, bonus_queue, start, end, clock)
                 # if event.key == pygame.K_SPACE and start and end:
-                #     run = False
+                #      run = False
 
 
 # NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
@@ -308,5 +314,5 @@ clock = pygame.time.Clock()
 main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_2_a_nonedit")
+video.make_mp4("maze_2_heat")
 video.destroy_png()

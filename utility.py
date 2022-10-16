@@ -1,20 +1,28 @@
 import math
 from queue import Queue
 
-def sigmoid(x):
-        return 1/(1+math.exp(-x))
+# config: heat_value 
 
 def next_gen_heat(current_config):
-        distance, heat_value = current_config
-        return distance+1, heat_value / 2
+    heat_value = current_config
+    return heat_value / 1.1
 
-def mark_heat_trace(grid, heat_source, heat_val):
+def update_heat(point, config):
+    point.heat_value += config
+    
+def minimal_congif(config):
     cancel_threshhold = 0.5
+    if(abs(config) >= abs(cancel_threshhold)):
+        return False
+    else:
+        return True
+
+def mark_heat_trace(grid, heat_source, heat_val):    
     heat_source.heat_value += heat_val
     closed = []
 
     queue = Queue()
-    config = (1, heat_val)
+    config = heat_val
     queue.put((config, heat_source))
 
     while not queue.empty():
@@ -25,15 +33,36 @@ def mark_heat_trace(grid, heat_source, heat_val):
         new_config = next_gen_heat(cur_config)
 
         # if heat val is significant enough
-        if (abs(new_config[1]) >= abs(cancel_threshhold)):
+        if not minimal_congif(new_config):
             current_point.update_neighbors(grid)
             for neighbor in current_point.neighbors:
                 # closed node won't gain heat val
                 if not neighbor in closed:
-                    neighbor.heat_value += new_config[1]
+                    update_heat(neighbor, new_config)
                     queue.put((new_config, neighbor))
 
         closed.append(current_point)
-        
+
+
 def delete_heat(grid, heat_source, heat_val):
-    mark_heat_trace(grid, heat_source, -1* heat_val)
+    mark_heat_trace(grid, heat_source, -1 * heat_val)
+
+
+def queue_search(point, bonus_queue):
+    for item in bonus_queue.queue:
+        if (point.get_pos() == item[1]):
+            return item[0]  # return heat value
+    return 1
+
+def sigmoid(x):
+    return 1/(1+math.exp(-x))
+
+def distance(a, b):
+    return math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2)
+
+def max_heat(grid):
+    ans = 0
+    for row in grid:
+        for node in row:
+            ans = max(ans, abs(node.heat_value)) 
+    return ans

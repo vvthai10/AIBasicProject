@@ -1,3 +1,4 @@
+from dis import dis
 from queue import PriorityQueue, Queue
 import utility as util
 import math
@@ -176,13 +177,7 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock, bonus_q = Queue()):
     def heuristic_1(point, end):
         x1, y1 = point.get_pos()
         x2, y2 = end.get_pos()
-        return abs(x1 - x2) + abs(y1 - y2) + point.heat_value
-    
-    def q_search(point, bonus_queue):
-        for item in bonus_queue.queue:
-            if(point == item[1]):
-                return item[0] # return heat value
-        return 1
+        return abs(x1 - x2) + abs(y1 - y2) + point.heat_value       
 
     way = []
     path = []
@@ -191,6 +186,7 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock, bonus_q = Queue()):
     queue = PriorityQueue()
 
     queue.put((heuristic_1(start, end), (start.get_pos())))
+    
 
     while not queue.empty():
         value_heuristic, (x_pos, y_pos) = queue.get()        
@@ -217,7 +213,7 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock, bonus_q = Queue()):
 
             reconstruct_path(way, grid, draw, clock)
             return True
-        heat_value = q_search(node, bonus_q)
+        heat_value = util.queue_search(node, bonus_q)
         if heat_value != 1:
             util.delete_heat(grid, node, heat_value)
         
@@ -305,7 +301,7 @@ def algorithm_astar(draw, grid, start, end, clock):
     # Sẽ dùng h_n tính khoảng cách từ nó tới đính và khoảng cách từ nó tới điểm gần đó + gần đó tới đích + bonus -> Nếu chi phí rẻ hơn thì đi ko thì thôi.
 # Sẽ tìm khoảng cách từ điểm hiện tại cho tới điểm thỏa mãn
 
-
+'''
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
     def check_with_line(point, start, end):
@@ -397,7 +393,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
         x1, y1 = neighbor.get_pos()
         x2, y2 = end.get_pos()
 
-        return (x1 - x2) ** 2 + (y1 - y2) ** 2
+        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2) + neighbor.heat_value
 
     def heuristic_2(neighbor, end):
         x1, y1 = neighbor.get_pos()
@@ -406,9 +402,9 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
         return abs(x1-x2) + abs(y1-y2)
 
 
-    '''
+
         =========================== START OF MAIN FUNCTION =========================== 
-    '''
+        
     way = []
     open = PriorityQueue()
     closed = []
@@ -420,15 +416,15 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
     # g_start = 1
     # (f_n, (pos))
     cur_start = start
-    g[start.get_pos()[0]][start.get_pos()[1]] = 1;
+    g[start.get_pos()[0]][start.get_pos()[1]] = 1
 
     bonus_priorities, bonus_other = compact_bonus(bonus, start, end)
 
-    '''
+
         - Với mỗi điểm trong bonus_priorities sẽ duyệt, sau khi duyệt, kiểm tra vị trí các điểm gần nhất thỏa điều kiện F thì sẽ duyệt các điểm đó cho 
         - Hàm F sẽ là tính khoảng cách giữa điểm đang xét tới 1 điểm lớn nhất bên kia + điểm bên kia + tới điểm tiếp theo bên này + bonus:
             - Nếu nó vẫn < 0 thì mình sẽ duyệt ngược lại thì xét các điểm nhỏ dần
-    '''
+
     # Sẽ chuyển thằng bonus_priorities thành priority queue
     isCheckOther = True
     bonus_queue = PriorityQueue()
@@ -592,4 +588,65 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
 # def WaysFind():
 #     return ways_total, ways_true
-  
+'''
+
+def algorithm_bonus_astar(draw, grid, bonus_queue, start, end, clock):    
+    def h_x(point):
+        return util.distance(point, end) + point.heat_value
+    
+    def g_x(point, target):
+        return abs(point.x-target.x) + abs(point.y-target.y)
+    
+    def heuristic(point, target):
+        return h_x(point) + g_x(point, target)
+    
+    way = []
+    open = PriorityQueue()   # contain nodes (f_n, node)
+    closed = []              # contain nodes  
+    parents = {}             # contain positions
+        
+    open.put(( 1 + heuristic(start, start), start))
+    print(bonus_queue.queue)
+
+    while not open.empty():
+        # print(grid[5][13].heat_value)
+        value_heuristic, node = open.get()        
+        pos = node.get_pos()
+
+        if pos in closed:
+            continue
+        else:
+            closed.append(node)
+                                      
+        if pos == end.get_pos(): # reach the end
+            pos_start = start.get_pos()
+            child = end.get_pos()
+            parent = parents[child]
+            while(parent != pos_start):
+                way.append(parent)
+                child = parent
+                parent = parents[child]
+
+            reconstruct_path(way, grid, draw, clock)
+            return True
+        elif node != start: # not reach the end
+            node.make_open()
+        
+        # check if reach bonus point
+        heat_value = util.queue_search(node, bonus_queue) 
+        # heat_value = 1 when this isn't a point bonus
+        if heat_value != 1:
+            print("reach bonus point: ", node.get_pos())
+            util.delete_heat(grid, node, heat_value)
+        
+        # open new node
+        for neighbor in node.neighbors:           
+            if not neighbor in closed:
+                value = heuristic(neighbor, end) 
+                open.put((value, neighbor))
+                parents[neighbor.get_pos()] = pos
+                    
+        closed.append(node)
+        clock.tick(FPS)
+        draw()        
+    return False
