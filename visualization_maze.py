@@ -5,7 +5,7 @@ import sys
 import pygame.camera
 from pygame.locals import *
 from handle_file_maze import read_file
-import algorithm as algo 
+import algorithm as algo
 from make_video import Video
 import utility as util
 from utility import SIZE as SIZE
@@ -53,10 +53,10 @@ class Node:
         self.total_cols = total_cols
         self.alpha = 255
         # heatmap related
-        self.heat_value = 0 # alway negative
+        self.heat_value = 0  # alway negative
         pygame.init()
         self.normal_font = pygame.font.SysFont('Arial', 12)
-        self.bold_font = pygame.font.SysFont('Arial', 16, bold= True)
+        self.bold_font = pygame.font.SysFont('Arial', 16, bold=True)
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -118,20 +118,20 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
 
-    def draw_heatmap(self, screen):                      
+    def draw_heatmap(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
-        s.set_alpha(self.alpha)                # alpha level       
+        s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
         if not self.is_wall():
             if self.is_bonus():
                 screen.blit(self.bold_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
-                         (self.x + self.size/4, self.y + self.size/4))
+                            (self.x + self.size/4, self.y + self.size/4))
             elif self.heat_value != 0:
                 screen.blit(self.normal_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
-                         (self.x + self.size/4, self.y + self.size/4))
+                            (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -177,24 +177,24 @@ def draw_grid(screen, rows, cols, width, height):
 
 
 def draw(screen, grid, rows, cols, width, height, heatmap=False):
-    # def update_heat_gradient(grid, max_heat, base_color = WHITE, target_color = WHITE):        
+    # def update_heat_gradient(grid, max_heat, base_color = WHITE, target_color = WHITE):
     #     for row in grid:
     #         for node in row:
     #             if node.color == WHITE and node.heat_value != 0:
-    #                 ratio = abs(node.heat_value / max_heat)                                                  
-    #                 new_color = []                    
-    #                 for i in range(3):                        
+    #                 ratio = abs(node.heat_value / max_heat)
+    #                 new_color = []
+    #                 for i in range(3):
     #                     calculation = float(target_color[i] - base_color[i]) * ratio + float(base_color[i])
     #                     new_color.append(int(calculation))
     #                 node.color = new_color
-                                
+
     screen.fill(WHITE)
 
     for row in grid:
         for node in row:
             if heatmap:
-                max_heat = util.max_heat(grid)                   
-                # update_heat_gradient(grid, max_heat)             
+                max_heat = util.max_heat(grid)
+                # update_heat_gradient(grid, max_heat)
                 node.draw_heatmap(screen)
             else:
                 node.draw(screen)
@@ -217,7 +217,7 @@ def merge_maze_grid(maze, grid):
                 start = node
                 start.make_start()
             elif maze[i][j] == ' ':
-                if (i == 0) or (i == len(maze)-1) or (j == 0) or (j==len(maze[0])-1):
+                if (i == 0) or (i == len(maze)-1) or (j == 0) or (j == len(maze[0])-1):
                     end = node
                     end.make_end()
             else:
@@ -238,8 +238,8 @@ def merge_bonus_grid(bonus_points, grid):
     return bonus_queue
 
 
-def main(screen, maze, bonus_points, width, height):    
-                
+def main(screen, maze, bonus_points, width, height):
+
     grid = make_grid(ROWS, COLS)
 
     start = None
@@ -249,13 +249,13 @@ def main(screen, maze, bonus_points, width, height):
     start, end = merge_maze_grid(maze, grid)
     merge_bonus_grid(bonus_points, grid)
     util.update_heat_grid(grid, bonus_points)
-        
+
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
-    # wait()  
-    run = True  
+    # wait()
+    run = True
     while run:
-        draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)        
+        draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -288,11 +288,10 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 maze_name = '2'
-bonus_points, maze = read_file("./maze/maze_"+ maze_name + ".txt")
+bonus_points, maze = read_file("./maze/maze_" + maze_name + ".txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
-
 
 
 WIDTH = COLS * SIZE
