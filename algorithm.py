@@ -335,6 +335,7 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
         return False
 
     way = []
+    closed = []
     open = PriorityQueue()   # contain nodes (f_n, node)
     parents = {}             # contain positions
     checkpoint_pos = start.get_pos()
@@ -385,15 +386,17 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
             # reset queues
             parents.clear()
             open = PriorityQueue()
+            closed = []
             open.put((heuristic(node), node))
 
         # open new node
         for neighbor in node.neighbors:
-            if not check_parent(node, neighbor, parents, checkpoint_pos):
+            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor  in closed:
                 value = heuristic(neighbor)
                 open.put((value, neighbor))
                 parents[neighbor.get_pos()] = pos
-
+        
+        closed.append(node)
         clock.tick(FPS)
         draw()
     return False
