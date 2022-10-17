@@ -308,9 +308,8 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
         return util.distance(point, end) 
     
     def g_x(point, bonus_list = bonus_list):
-        if (point.bonus < 0 
-                and (point.y/util.SIZE, point.x/util.SIZE, point.bonus) in bonus_list):
-            print("FOUND")
+        if (point.is_bonus() 
+                and (point.y/util.SIZE, point.x/util.SIZE, point.bonus) in bonus_list):            
             return point.heat_value + point.bonus * 10 # edit thiss
         else:
             return point.heat_value
@@ -342,8 +341,7 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
     # print(bonus_queue.queue)   experimental
 
     while not open.empty():        
-        value_heuristic, node = open.get()    
-        print(value_heuristic)
+        value_heuristic, node = open.get()            
         pos = node.get_pos()        
         if pos == end.get_pos(): # reach the end
             tmp_way = [pos]

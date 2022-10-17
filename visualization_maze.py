@@ -55,7 +55,8 @@ class Node:
         # heatmap related
         self.heat_value = 0 # alway negative
         pygame.init()
-        self.font = pygame.font.SysFont('Arial', 12)
+        self.normal_font = pygame.font.SysFont('Arial', 12)
+        self.bold_font = pygame.font.SysFont('Arial', 16, bold= True)
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -124,9 +125,13 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
-        if (self.color != BLACK):
-            screen.blit(self.font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
-                        (self.x + self.size/4, self.y + self.size/4))
+        if not self.is_wall():
+            if self.is_bonus():
+                screen.blit(self.bold_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
+                         (self.x + self.size/4, self.y + self.size/4))
+            elif self.heat_value != 0:
+                screen.blit(self.normal_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
+                         (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -282,7 +287,7 @@ def main(screen, maze, bonus_points, width, height):
 """
 Start simulation
 """
-maze_name = '5'
+maze_name = '2'
 bonus_points, maze = read_file("./maze/maze_"+ maze_name + ".txt")
 
 ROWS = len(maze)
