@@ -32,7 +32,7 @@ def minimal_congif(config, is_distance = False):
 
 def mark_trace(grid, source_node, root_value, is_distance = False):
     if is_distance:
-        source_node.distance = 0
+        source_node.min_distance += root_value
     else:
         source_node.heat_value += root_value
     closed = []
@@ -54,11 +54,11 @@ def mark_trace(grid, source_node, root_value, is_distance = False):
             for neighbor in point.neighbors:
                 # closed node won't gain heat val
                 if is_distance:
-                    if not neighbor in closed and neighbor.min_distance != 0:
+                    if not neighbor in closed and not neighbor.is_pickups():
                         update_node(neighbor, new_config, is_distance)
                         queue.put((new_config, neighbor))
                 else:
-                    if not neighbor in closed and neighbor.bonus == 0:
+                    if not neighbor in closed and not neighbor.is_bonus():
                         update_node(neighbor, new_config, is_distance)
                         queue.put((new_config, neighbor))
 
@@ -72,6 +72,8 @@ def sigmoid(x):
 def distance(a, b, rect_size=SIZE):
     return math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2)/rect_size
 
+def step_distance(a, b, rect_size=SIZE):
+    return (abs(a.x-b.x) + abs(a.y-b.y))/rect_size
 
 def max_heat(grid):
     ans = 0
@@ -95,7 +97,7 @@ def update_bonus_grid(grid, point_list):
         pos_x, pos_y, value = tmpQ[0]
         tmpQ.pop(0)
         point = grid[pos_x][pos_y]
-        mark_trace(grid, point, value)
+        mark_trace(grid, point, value)    
         
 def update_distance_grid(grid, point_list):
     # clone bonus_list
@@ -104,11 +106,17 @@ def update_distance_grid(grid, point_list):
     # reset heat grid
     for row in grid:
         for node in row:            
-            node.min_distance = -1            
+            node.reset_distance()
 
     # mark new heat sources
     while len(tmpQ) != 0:        
         pos_x, pos_y = tmpQ[0]        
         tmpQ.pop(0)
         point = grid[pos_x][pos_y]
-        mark_trace(grid, point, 0, is_distance=True)
+        mark_trace(grid, point, 0, is_distance=True)    
+        
+def check_bonus_list(node, point_list):
+    return (node.y/SIZE, node.x/SIZE, node.bonus) in point_list
+
+def check_pickup_list(node, point_list):
+    return (node.y/SIZE, node.x/SIZE) in point_list

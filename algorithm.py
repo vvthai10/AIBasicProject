@@ -4,7 +4,7 @@ from queue import PriorityQueue, Queue
 import utility as util
 import math
 
-FPS = 5
+FPS = 45
 
 
 def reconstruct_path(way, grid, draw, clock):
@@ -75,7 +75,6 @@ def getItem(priorityQueue):
     for item in priorityQueue:
         if priorityQueue[temp] > priorityQueue[item]:
             temp = item
-
     return temp
 
 
@@ -307,10 +306,14 @@ def algorithm_astar(draw, grid, start, end, clock):
     # Sẽ dùng h_n tính khoảng cách từ nó tới đính và khoảng cách từ nó tới điểm gần đó + gần đó tới đích + bonus -> Nếu chi phí rẻ hơn thì đi ko thì thôi.
 # Sẽ tìm khoảng cách từ điểm hiện tại cho tới điểm thỏa mãn
 
-
-def algorithm_bonus_pickups_astar(draw, grid, bonus_list, pick_up_list, start, end, clock):
-    def h_x(point, pick_up_list):
-        if pick_up_list: # ignore end while this are pick up point
+'''
+stats:
+maze 8: -406
+maze 9: -472
+'''
+def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end, clock):
+    def h_x(point):
+        if pickup_list: # ignore end while this are pick up point
             return point.min_distance
         else:    
             return util.distance(point, end)
@@ -324,7 +327,17 @@ def algorithm_bonus_pickups_astar(draw, grid, bonus_list, pick_up_list, start, e
 
     def heuristic(target):
         return h_x(target) + g_x(target)
-
+    
+    def remove_pickup(grid, node, pickup_list):
+        pickup_list.remove((node.y/util.SIZE, node.x/util.SIZE))
+        node.reset()
+        util.update_distance_grid(grid, pickup_list)
+        
+    def remove_bonus(grid, node, bonus_list):        
+        bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))            
+        node.reset()
+        util.update_bonus_grid(grid, bonus_list)
+        
     def check_parent(leaf_node, node_to_check, parent_list, pos_root):
         child = leaf_node.get_pos()
         parent = parent_list.get(child)
@@ -345,7 +358,7 @@ def algorithm_bonus_pickups_astar(draw, grid, bonus_list, pick_up_list, start, e
     open.put((heuristic(start), start))
 
     while not open.empty():
-        value_heuristic, node = open.get()
+        value_heuristic, node = open.get()        
         pos = node.get_pos()
         if pos == end.get_pos():  # reach the end
             tmp_way = [pos]
@@ -364,11 +377,8 @@ def algorithm_bonus_pickups_astar(draw, grid, bonus_list, pick_up_list, start, e
             node.make_open()
 
         # check if reach bonus point
-        if node.bonus < 0:
-            # delete node from bonus queue
-            bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
-            # re-draw heat grid
-            util.update_bonus_grid(grid, bonus_list)
+        if util.check_bonus_list(node, bonus_list):                        
+            remove_bonus(grid,node,bonus_list)            
 
             # find this part of the way
             tmp_way = []
@@ -389,12 +399,38 @@ def algorithm_bonus_pickups_astar(draw, grid, bonus_list, pick_up_list, start, e
             # reset queues
             parents.clear()
             open = PriorityQueue()
-            closed = []
+            closed = []            
             open.put((heuristic(node), node))
+                
+        # check if reach bonus point
+        elif util.check_pickup_list(node, pickup_list):                                                
+            remove_pickup(grid, node,pickup_list)
+                        
+            # find this part of the way
+            tmp_way = []
+            child = node.get_pos()
+            parent = parents.get(child)
+            if parent:  # if not run reverse
+                while parent != checkpoint_pos:
+                    tmp_way.append(parent)
+                    child = parent
+                    parent = parents[child]
+                tmp_way.append(checkpoint_pos)
+                tmp_way.reverse()
 
+            # add tmp_way to way
+            way = way + tmp_way
+            # update checkpoint
+            checkpoint_pos = node.get_pos()
+            # reset queues
+            parents.clear()
+            open = PriorityQueue()
+            closed = []            
+            open.put((heuristic(node), node))
+            
         # open new node
-        for neighbor in node.neighbors:
-            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor  in closed:
+        for neighbor in node.neighbors:            
+            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor in closed:                
                 value = heuristic(neighbor)
                 open.put((value, neighbor))
                 parents[neighbor.get_pos()] = pos

@@ -90,8 +90,11 @@ class Node:
         return self.color == BLUE
 
     def reset(self):
-        self.color = WHITE
-
+        self.color = WHITE        
+        
+    def reset_distance(self):
+        self.min_distance = -1
+        
     def make_start(self):
         self.color = ORANGE
 
@@ -154,6 +157,17 @@ class Node:
         if not self.is_wall() and not self.is_pickups():            
             screen.blit(self.normal_font.render(str(round(self.min_distance, 2)), True, (0, 0, 0)),
                             (self.x + self.size/4, self.y + self.size/4))
+            
+    def draw_all_map(self, screen):
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))
+        # if not wall
+        if not self.is_wall() and not self.is_pickups():            
+            screen.blit(self.normal_font.render(str(round(2*self.min_distance + self.heat_value, 2)), True, (0, 0, 0)),
+                            (self.x + self.size/4, self.y + self.size/4))
                 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -206,8 +220,10 @@ def draw(screen, grid, rows, cols, width, height, addtional_map = "None"):
             if addtional_map != "None":
                 if addtional_map.lower() == "heat":
                     node.draw_heatmap(screen)
-                else:
+                elif addtional_map.lower() == "distance":
                     node.draw_distance_map(screen)
+                else:                    
+                    node.draw_all_map(screen)
             else:
                 node.draw(screen)
 
@@ -277,9 +293,10 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
     # wait()
+    addtional_map = 'both'
     run = True
     while run:
-        draw(screen, grid, ROWS, COLS, width, height, addtional_map='dis')
+        draw(screen, grid, ROWS, COLS, width, height, addtional_map)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -291,8 +308,8 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
                         for node in row:
                             node.update_neighbors(grid)
 
-                    algo.algorithm_bonus_astar(lambda: draw(
-                        screen, grid, ROWS, COLS, width, height, map='dis'), grid, bonus_points, start, end, clock)
+                    algo.algorithm_bonus_pickup_astar(lambda: draw(
+                        screen, grid, ROWS, COLS, width, height, addtional_map), grid, bonus_points, pickup_points ,start, end, clock)
                 # if event.key == pygame.K_SPACE and start and end:
                 #      run = False
 
@@ -311,7 +328,7 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
 """
 Start simulation
 """
-maze_name = '6'
+maze_name = '9'
 maze, bonus_points, pickup_points = read_file("./maze/maze_" + maze_name + ".txt")
 
 ROWS = len(maze)
