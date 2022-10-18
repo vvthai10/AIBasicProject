@@ -242,17 +242,11 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
 
 def algorithm_astar(draw, grid, start, end, clock):
 
-    def heuristic_1(neighbor, end):
+    def euclid_dis(neighbor, end): #heuristic
         x1, y1 = neighbor.get_pos()
         x2, y2 = end.get_pos()
 
         return (x1 - x2) ** 2 + (y1 - y2) ** 2
-
-    def heuristic_2(neighbor, end):
-        x1, y1 = neighbor.get_pos()
-        x2, y2 = end.get_pos()
-
-        return abs(x1-x2) + abs(y1-y2)
 
 
     # main
@@ -266,7 +260,7 @@ def algorithm_astar(draw, grid, start, end, clock):
 
     # g_start = 1
     # (f_n, (pos))
-    open.put(( 1 + heuristic_1(start, end), (start.get_pos())))
+    open.put(( 1 + euclid_dis(start, end), (start.get_pos())))
 
     while not open.empty():
         f_prev, (x_cur, y_cur) = open.get()
@@ -713,6 +707,101 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus, pickups, start, end, clock):
         pickups_4 = PriorityQueue()
         bonus_4 = PriorityQueue()
 
+                if cur_pos == end_cur_pos:
+                    # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
+                    child = end_cur_pos
+                    parent = parents[child]
+                    ways = []
+                    ways.append(child)
+                    while(parent != start_cur_pos):
+                        ways.append(parent)
+                        child = parent
+                        parent = parents[child]
+                    ways.append(start_cur_pos)
+                    ways.reverse()
+                    WAYS_TOTAL.extend(ways)
+                    clean_path_parents_is_used()
+                    start_cur_pos = end_cur_pos
+                    break
+                
+                grid[cur_pos[0]][cur_pos[1]].make_open()
+
+                for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
+                    # WARNING!!!!!!!!
+                    new_pos = neighbor.get_pos()
+                    if not new_pos in closed:
+                        # print(f"\tAdd neighbor {new_pos}")
+                        # NOTE: g[r][c].get_bonus()
+                        g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        g[new_pos[0]][new_pos[1]] = g_n
+                        h_n = heuristic_1(new_pos, end_cur_pos) 
+                        f_n = g_n + h_n
+                        opens.put((f_n, new_pos))
+
+                        parents[new_pos] = cur_pos
+                        grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+                
+                clock.tick(FPS)
+                draw()
+        
+    # Từ điểm hiện tại đến cuối đường
+    end_cur_pos = end_pos
+    opens = PriorityQueue()
+    g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+    g_n = g[start_cur_pos[0]][start_cur_pos[1]]
+    h_n = heuristic_1(start_cur_pos, end_cur_pos)
+    f_n = g_n + h_n
+    opens.put((f_n, start_cur_pos))
+
+    while not opens.empty():
+        f_prev, (cur_pos) = opens.get()
+        # print(f"Start with pos: {cur_pos}")
+        
+        closed.append(cur_pos)
+
+        if cur_pos == end_cur_pos:
+            # start_cur_pos = end_cur_pos
+            # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
+            child = end_pos
+            parent = parents[child]
+            ways = []
+            ways.append(child)
+            while(parent != start_cur_pos):
+                ways.append(parent)
+                child = parent
+                parent = parents[child]
+            ways.append(start_cur_pos)
+            ways.reverse()
+            WAYS_TOTAL.extend(ways)
+            # clean_path_parents_is_used()
+
+                    
+            # print(WAYS_TOTAL)
+            WAYS_TOTAL.reverse()
+            reconstruct_path(WAYS_TOTAL, grid, draw, clock)
+            print(g[end_pos[0]][end_pos[1]])
+            return True
+        
+        if cur_pos != start_pos and cur_pos != end_pos:
+            grid[cur_pos[0]][cur_pos[1]].make_open()
+
+        for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
+            # WARNING!!!!!!!!
+            new_pos = neighbor.get_pos()
+            if not new_pos in closed:
+                # print(f"\tAdd neighbor {new_pos}")
+                # NOTE: g[r][c].get_bonus()
+                g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                g[new_pos[0]][new_pos[1]] = g_n
+                h_n = heuristic_1(new_pos, end_cur_pos) 
+                f_n = g_n + h_n
+                opens.put((f_n, new_pos))
+
+                parents[new_pos] = cur_pos
+                grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+        
+        clock.tick(FPS)
+        draw()    
 
         while not pickups.empty():
             (r_cur, c_cur) = pickups.get()
