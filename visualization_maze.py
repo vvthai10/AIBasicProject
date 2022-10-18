@@ -288,7 +288,7 @@ def main(screen, maze, bonus_points, width, height):
 Start simulation
 """
 maze_name = '5'
-bonus_points, maze = read_file("./maze/maze_" + maze_name + ".txt")
+maze, bonus_points, pickup_points = read_file("./maze/maze_" + maze_name + ".txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
