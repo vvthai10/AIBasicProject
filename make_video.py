@@ -3,7 +3,7 @@ import cv2
 import shutil
 
 PATH_IMAGES =  os.path.dirname(__file__) + "\images\\"
-PATH_VIDEO = os.path.dirname(__file__) + "\\videos\\"
+PATH_VIDEO = os.path.dirname(__file__) + "\\output\\"
 FPS = 15
 
 class Video:
@@ -48,6 +48,7 @@ class Video:
 
     def destroy_png(self):
         print("Destroy")
+        self.cnt = 0
         for filename in os.listdir(self.path):
             file_path = os.path.join(self.path, filename)
             try:

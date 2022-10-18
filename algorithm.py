@@ -5,13 +5,16 @@ FPS = 5
 
 def reconstruct_path(way, grid, draw, clock):
     way.reverse()
+    cost = 0
     for current in way:
         node = grid[current[0]][current[1]]
         node.make_path()
-        
+        cost = cost + 1 + node.bonus
         clock.tick(FPS)
         draw()
-
+    print ("chi phi duong di la ", cost)
+    
+    return way, cost
 
 def algorithm_dfs(draw, grid, start, end, clock):
     way = [] # Đường đi đúng nhất từ điểm bắt đầu cho tới điểm cuối
@@ -47,9 +50,9 @@ def algorithm_dfs(draw, grid, start, end, clock):
                         
             # print(f"Ways: {ways}")
             # In ra đường đi
-            reconstruct_path(way, grid, draw, clock)
-            print("chi phi duong di la dfs: ", len(way))
-            return True
+            return reconstruct_path(way, grid, draw, clock)
+            
+            
 
         for neighbor in node.neighbors:
             if not neighbor.get_pos() in path:
@@ -59,7 +62,7 @@ def algorithm_dfs(draw, grid, start, end, clock):
         clock.tick(FPS)
         draw()
 
-    return False
+    return [], 0
 #lay item co chi phi nho nhat trong hang doi
 def getItem(priorityQueue):
     temp = list(priorityQueue.keys())[0]
@@ -68,7 +71,6 @@ def getItem(priorityQueue):
             temp = item
     
     return temp
-
 
 def algorithm_ucs(draw,grid,start,end,clock):
     way = [] # Đường đi đúng nhất từ điểm bắt đầu cho tới điểm cuối
@@ -104,12 +106,12 @@ def algorithm_ucs(draw,grid,start,end,clock):
                         
             # print(f"Ways: {ways}")
             # In ra đường đi
-            reconstruct_path(way, grid, draw, clock)
-            print("chi phi duong di cua ucs: ", len(way))
-            return True
+            return reconstruct_path(way, grid, draw, clock)
+            
+            
         
         for neighbor in node.neighbors:
-            if not neighbor.get_pos() in path :
+            if not neighbor.get_pos() in path:
                 #nếu điểm kế tiếp chua có trong hàng đợi thì thêm
                 if not neighbor.get_pos() in priorityQueue:
                     priorityQueue[neighbor.get_pos()] = (cost + node.costs[neighbor.get_pos()])
@@ -122,8 +124,7 @@ def algorithm_ucs(draw,grid,start,end,clock):
         clock.tick(FPS)
         draw()
     
-    return False
-
+    return [], 0
 
 def algorithm_bfs(draw, grid, start, end, clock):
     way = []
@@ -155,9 +156,8 @@ def algorithm_bfs(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            reconstruct_path(way, grid, draw, clock)
-            print("chi phi duong di la cua bfs: " , len(way))
-            return True
+            return reconstruct_path(way, grid, draw, clock)
+            
 
         for neighbor in node.neighbors:
             # WARNING!!!!!!!!
@@ -168,7 +168,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
         clock.tick(FPS)
         draw()
 
-    return False
+    return [], 0
 
 def algorithm_greedy_bfs(draw, grid, start, end, clock):
 
@@ -216,21 +216,21 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            reconstruct_path(way, grid, draw, clock)
-            return True
+            return reconstruct_path(way, grid, draw, clock)
+            
 
         for neighbor in node.neighbors:
             # WARNING!!!!!!!!
             if not neighbor.get_pos() in path:
                 value = heuristic_1(neighbor, end) 
-                if value <= value_heuristic:
+                if value <= value_heuristic: #tai sao phai co phep so sanh nay ???
                     queue.put((value, neighbor.get_pos()))
                     parents[neighbor.get_pos()] = pos
-        
+
         clock.tick(FPS)
         draw()
 
-    return False
+    return [], 0
 
 def algorithm_astar(draw, grid, start, end, clock):
 
@@ -258,7 +258,7 @@ def algorithm_astar(draw, grid, start, end, clock):
 
     # g_start = 1
     # (f_n, (pos))
-    open.put(( 1 + heuristic_1(start, end), (start.get_pos())))
+    open.put(( 0 + heuristic_1(start, end), (start.get_pos())))
 
     while not open.empty():
         f_prev, (x_cur, y_cur) = open.get()
@@ -274,8 +274,8 @@ def algorithm_astar(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            reconstruct_path(way, grid, draw, clock)
-            return True
+            return reconstruct_path(way, grid, draw, clock)
+            
         
         if not grid[x_cur][y_cur].is_start():
             grid[x_cur][y_cur].make_open()
@@ -286,6 +286,7 @@ def algorithm_astar(draw, grid, start, end, clock):
             x_new, y_new = neighbor.get_pos()
             if not (x_new, y_new) in closed:
                 g_n = 1 + g[x_cur][y_cur]
+                g[x_new][y_new] = g_n # cập nhật chi phí từ điểm bắt đầu tới điểm x_new,y_new
                 h_n = heuristic_1(neighbor, end) 
                 f_n = g_n + h_n
                 open.put((f_n, (x_new, y_new)))
@@ -294,6 +295,7 @@ def algorithm_astar(draw, grid, start, end, clock):
         
         clock.tick(FPS)
         draw()
+    return [], 0
 
 
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
