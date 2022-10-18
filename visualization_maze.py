@@ -8,7 +8,7 @@ from pygame.locals import *
 import math
 import random
 from handle_file_maze import *
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar
 from make_video import Video
 import matplotlib.pyplot as plt
 import copy
@@ -18,7 +18,7 @@ FPS = 10
 
 RED = (255, 0, 0)
 GREEN = (144, 229, 150)
-BLUE = (158,219,227)
+BLUE = (51, 143, 165)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (56, 55, 56)
@@ -52,12 +52,12 @@ class Node:
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
+        self.parents = []
 
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
             self.alpha = self.alpha - 20
-
     def get_pos(self):
         return self.row, self.col
 
@@ -80,6 +80,9 @@ class Node:
     def is_bonus(self):
         return self.color == YELLOW
     
+    def is_pickups(self):
+        return self.color == BLUE
+
     def reset(self):
         self.color = WHITE
 
@@ -87,7 +90,11 @@ class Node:
         self.color = ORANGE
 
     def make_open(self):
-        self.color = GREEN
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+            self.color = GREEN
+            self.alpha = 255
+        else:
+            self.alpha = 200
     
     # It use in A* ~ I don't sure.
     def make_closed(self):
@@ -99,15 +106,19 @@ class Node:
     def make_end(self):
         self.color = TURQUOISE
 
-    def make_bonus(self,bonus):
+    def make_bonus(self):
         self.color = YELLOW
-        self.bonus = bonus
+
+    def make_pickups(self):
+        self.color = BLUE
     
     def make_path(self):
-        self.color = PURPLE
-        self.alpha = 255
-    
-    
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+            self.color = PURPLE
+            self.alpha = 255
+        else:
+            self.alpha = 120
+
     def draw(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
@@ -174,7 +185,7 @@ def merge_maze_grid(maze, grid, ROWS,COLS):
     for i in range(ROWS):
         for j in range(COLS):
             node = grid[i][j]
-            if(maze[i][j] == 'S'):
+            if(maze[i][j] == 'S' or maze[i][j] == '*'):
                 start = node
                 start.make_start()
             elif maze[i][j] == ' ':
@@ -189,19 +200,26 @@ def merge_maze_grid(maze, grid, ROWS,COLS):
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
     bonus_queue = PriorityQueue()
-    
+    i = 0
     for point in bonus_points:
         bonus_queue.put((point[2], (point[0], point[1])))
-        grid[point[0]][point[1]].make_bonus(point[2])
-        
-
+        grid[point[0]][point[1]].make_bonus()
+        grid[point[0]][point[1]].bonus = point[2]
+        i += 1
+    
+    print(i)
     return bonus_queue
 
-    for i in range(ROWS):
-        for j in range(COLS):
-            node = grid[i][j]
-            node.make_heuristic(end)
+def merge_pickups_grid(pickup_points, grid):
+    # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+    pickups_queue = PriorityQueue()
 
+    for point in pickup_points:
+        pickups_queue.put(((point[0], point[1])))
+        grid[point[0]][point[1]].make_pickups()
+        grid[point[0]][point[1]].bonus = 0
+
+    return pickups_queue
 #lưu đường đi ra khỏi mê cung thành file .png
 def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = None):
     """
@@ -259,55 +277,14 @@ def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = Non
     plt.yticks([])
     plt.savefig(saveDir + ".png")
     
-def main(screen, maze, bonus_points, width, height):
-    grid = make_grid(ROWS, COLS)
-    way = []
-    start = None
-    end = None
 
-    start, end = merge_maze_grid(maze, grid)
-    bonus_queue = merge_bonus_grid(bonus_points, grid)
-    
-    run = True
-    # while run:
-    #     draw(screen, grid, ROWS, COLS, width, height)
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             run = False
-
-# NOTE: Phần này dùng để khi nhấn phím cách thì thuật toán mới chạy được
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_SPACE and start and end:
-            #         for row in grid:
-            #             for node in row:
-            #                 node.update_neighbors(grid)
-                    
-                    # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
-
-                
-# NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-    for row in grid:
-        for node in row:
-            node.update_neighbors(grid)
-    way = algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-    # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-    #run = False
-
-    #visualize_maze_by_image(maze,bonus_points,start,end,way)
-    
-    pygame.quit()
 
 def run():
     level, files = list_file()
 
     no_bonus_alg = ["dfs","bfs","ucs","gbfs","astar"]
     for file in files[level[1]]:
-        bonus_points, maze = read_file("./input/" + level[1] + "/" + file)
+        maze, bonus_points, pickup_point = read_file("./input/" + level[1] + "/" + file)
         
         ROWS = len(maze)
         COLS = len(maze[0])
@@ -318,8 +295,6 @@ def run():
         start = None
         end = None
 
-
-        
         for alg in no_bonus_alg:
             grid = make_grid(ROWS, COLS)
             start, end = merge_maze_grid(maze, grid,ROWS,COLS)
