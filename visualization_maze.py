@@ -166,7 +166,7 @@ class Node:
         screen.blit(s, (self.x, self.y))
         # if not wall
         if not self.is_wall() and not self.is_pickups():
-            screen.blit(self.normal_font.render(str(round(2*self.min_distance + self.heat_value, 2)), True, (0, 0, 0)),
+            screen.blit(self.normal_font.render(str(round(self.min_distance + self.heat_value, 2)), True, (0, 0, 0)),
                         (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
@@ -293,7 +293,7 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
     # wait()
-    addtional_map = 'none'
+    addtional_map = 'heat'
     run = True
     while run:
         draw(screen, grid, ROWS, COLS, width, height, addtional_map)

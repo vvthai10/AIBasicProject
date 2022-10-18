@@ -320,10 +320,9 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end
         else:
             return util.distance(point, end)
 
-    def g_x(point, bonus_list=bonus_list):
-        if (point.is_bonus()
-                and (point.y/util.SIZE, point.x/util.SIZE, point.bonus) in bonus_list):
-            return point.heat_value + point.bonus * 10  # edit thiss
+    def g_x(point):
+        if point.is_bonus():
+            return point.heat_value + point.bonus * 2.5  # prioritize near by bonus point
         else:
             return point.heat_value
 
