@@ -57,6 +57,8 @@ class Node:
         pygame.init()
         self.normal_font = pygame.font.SysFont('Arial', 12)
         self.bold_font = pygame.font.SysFont('Arial', 16, bold=True)
+        # distance map related
+        self.min_distance = -1 # always positive
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -91,9 +93,7 @@ class Node:
         self.color = ORANGE
 
     def make_open(self):
-        self.color = GREEN
-
-    # It use in A* ~ I don't sure.
+        self.color = GREEN    
 
     def make_closed(self):
         self.color = RED
@@ -118,7 +118,7 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
 
-    def draw_heatmap(self, screen):
+    def draw_distance_map(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
         s.set_alpha(self.alpha)                # alpha level
@@ -133,6 +133,21 @@ class Node:
                 screen.blit(self.normal_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
                             (self.x + self.size/4, self.y + self.size/4))
 
+    def draw_distance_map(self, screen):
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))
+        # if not wall
+        if not self.is_wall():
+            if self.is_bonus():
+                screen.blit(self.bold_font.render(str(round(self.min_distance, 2)), True, (0, 0, 0)),
+                            (self.x + self.size/4, self.y + self.size/4))
+            elif self.heat_value != 0:
+                screen.blit(self.normal_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
+                            (self.x + self.size/4, self.y + self.size/4))
+                
     def update_neighbors(self, grid):
         self.neighbors = []
         # DOWN

@@ -308,7 +308,7 @@ def algorithm_astar(draw, grid, start, end, clock):
 # Sẽ tìm khoảng cách từ điểm hiện tại cho tới điểm thỏa mãn
 
 
-def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
+def algorithm_bonus_astar(draw, grid, bonus_list, pick_up_list, start, end, clock):
     def h_x(point):
         return util.distance(point, end)
 
