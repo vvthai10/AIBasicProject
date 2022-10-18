@@ -292,7 +292,7 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
                             node.update_neighbors(grid)
 
                     algo.algorithm_bonus_astar(lambda: draw(
-                        screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap), grid, bonus_points, start, end, clock)
+                        screen, grid, ROWS, COLS, width, height, map='dis'), grid, bonus_points, start, end, clock)
                 # if event.key == pygame.K_SPACE and start and end:
                 #      run = False
 
