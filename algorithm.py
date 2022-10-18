@@ -309,8 +309,11 @@ def algorithm_astar(draw, grid, start, end, clock):
 
 
 def algorithm_bonus_astar(draw, grid, bonus_list, pick_up_list, start, end, clock):
-    def h_x(point):
-        return util.distance(point, end)
+    def h_x(point, pick_up_list):
+        if pick_up_list: # ignore end while this are pick up point
+            return point.min_distance
+        else:    
+            return util.distance(point, end)
 
     def g_x(point, bonus_list=bonus_list):
         if (point.is_bonus()
@@ -365,7 +368,7 @@ def algorithm_bonus_astar(draw, grid, bonus_list, pick_up_list, start, end, cloc
             # delete node from bonus queue
             bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
             # re-draw heat grid
-            util.update_bonus_grid(grid, bonus_list)
+            util.update_grid(grid, bonus_list)
 
             # find this part of the way
             tmp_way = []

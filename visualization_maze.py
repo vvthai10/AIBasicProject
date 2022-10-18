@@ -85,6 +85,9 @@ class Node:
 
     def is_bonus(self):
         return self.color == YELLOW
+    
+    def is_pickups(self):
+        return self.color == BLUE
 
     def reset(self):
         self.color = WHITE
@@ -93,8 +96,13 @@ class Node:
         self.color = ORANGE
 
     def make_open(self):
-        self.color = GREEN    
-
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+            self.color = GREEN
+            self.alpha = 255
+        else:
+            self.alpha = 200
+    
+    # It use in A* ~ I don't sure.
     def make_closed(self):
         self.color = RED
 
@@ -106,6 +114,9 @@ class Node:
 
     def make_bonus(self):
         self.color = YELLOW
+
+    def make_pickups(self):
+        self.color = BLUE
 
     def make_path(self):
         self.color = PURPLE
@@ -140,12 +151,8 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
-        if not self.is_wall():
-            if self.is_bonus():
-                screen.blit(self.bold_font.render(str(round(self.min_distance, 2)), True, (0, 0, 0)),
-                            (self.x + self.size/4, self.y + self.size/4))
-            elif self.heat_value != 0:
-                screen.blit(self.normal_font.render(str(round(self.heat_value, 2)), True, (0, 0, 0)),
+        if not self.is_wall():            
+            screen.blit(self.normal_font.render(str(round(self.min_distance, 2)), True, (0, 0, 0)),
                             (self.x + self.size/4, self.y + self.size/4))
                 
     def update_neighbors(self, grid):
@@ -192,17 +199,6 @@ def draw_grid(screen, rows, cols, width, height):
 
 
 def draw(screen, grid, rows, cols, width, height, heatmap=False):
-    # def update_heat_gradient(grid, max_heat, base_color = WHITE, target_color = WHITE):
-    #     for row in grid:
-    #         for node in row:
-    #             if node.color == WHITE and node.heat_value != 0:
-    #                 ratio = abs(node.heat_value / max_heat)
-    #                 new_color = []
-    #                 for i in range(3):
-    #                     calculation = float(target_color[i] - base_color[i]) * ratio + float(base_color[i])
-    #                     new_color.append(int(calculation))
-    #                 node.color = new_color
-
     screen.fill(WHITE)
 
     for row in grid:
@@ -263,7 +259,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     merge_bonus_grid(bonus_points, grid)
-    util.update_bonus_grid(grid, bonus_points)
+    util.update_grid(grid, bonus_points)
 
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
