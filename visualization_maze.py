@@ -249,6 +249,17 @@ def merge_bonus_grid(bonus_points, grid):
     return bonus_queue
 
 
+def merge_pickups_grid(pickup_points, grid):
+    # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+    pickups_queue = PriorityQueue()
+
+    for point in pickup_points:
+        pickups_queue.put(((point[0], point[1])))
+        grid[point[0]][point[1]].make_pickups()
+        grid[point[0]][point[1]].bonus = 0
+
+    return pickups_queue
+
 def main(screen, maze, bonus_points, width, height):
 
     grid = make_grid(ROWS, COLS)
@@ -259,6 +270,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     merge_bonus_grid(bonus_points, grid)
+    merge_pickups_grid(pickup_points, grid)
     util.update_grid(grid, bonus_points)
 
     # draw once and wait for input (KEY space)
