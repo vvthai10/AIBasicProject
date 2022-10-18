@@ -248,7 +248,7 @@ def main(screen, maze, bonus_points, width, height):
 
     start, end = merge_maze_grid(maze, grid)
     merge_bonus_grid(bonus_points, grid)
-    util.update_heat_grid(grid, bonus_points)
+    util.update_bonus_grid(grid, bonus_points)
 
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)

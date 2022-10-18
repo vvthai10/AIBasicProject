@@ -365,7 +365,7 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
             # delete node from bonus queue
             bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
             # re-draw heat grid
-            util.update_heat_grid(grid, bonus_list)
+            util.update_bonus_grid(grid, bonus_list)
 
             # find this part of the way
             tmp_way = []

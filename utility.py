@@ -65,7 +65,24 @@ def max_heat(grid):
     return ans
 
 
-def update_heat_grid(grid, bonus_list):
+def update_bonus_grid(grid, bonus_list):
+    # clone bonus_list
+    tmpQ = bonus_list.copy()
+
+    # reset heat grid
+    for row in grid:
+        for node in row:
+            node.heat_value = 0
+
+    # mark new heat sources
+    while len(tmpQ) != 0:
+        pos_x, pos_y, heat_val = tmpQ[0]
+        tmpQ.pop(0)
+        point = grid[pos_x][pos_y]
+        mark_heat_trace(grid, point, heat_val)
+
+
+def update_dis_grid(grid, bonus_list):
     # clone bonus_list
     tmpQ = bonus_list.copy()
 
