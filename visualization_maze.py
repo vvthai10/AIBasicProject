@@ -46,15 +46,15 @@ class Node:
         self.color = WHITE
         self.neighbors = []
         self.size = size
-        self.bonus = 0
+        self.bonus = 1
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
+        self.parents = []
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
             self.alpha = self.alpha - 20
-
     def get_pos(self):
         return self.row, self.col
 
@@ -87,7 +87,11 @@ class Node:
         self.color = ORANGE
 
     def make_open(self):
-        self.color = GREEN
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+            self.color = GREEN
+            self.alpha = 255
+        else:
+            self.alpha = 200
     
     # It use in A* ~ I don't sure.
     def make_closed(self):
@@ -106,8 +110,11 @@ class Node:
         self.color = BLUE
     
     def make_path(self):
-        self.color = PURPLE
-        self.alpha = 255
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+            self.color = PURPLE
+            self.alpha = 255
+        else:
+            self.alpha = 120
 
     def draw(self, screen):
         self.change_alpha()
@@ -194,6 +201,7 @@ def merge_bonus_grid(bonus_points, grid):
     for point in bonus_points:
         bonus_queue.put((point[2], (point[0], point[1])))
         grid[point[0]][point[1]].make_bonus()
+        grid[point[0]][point[1]].bonus = point[2]
         i += 1
     
     print(i)
@@ -206,6 +214,7 @@ def merge_pickups_grid(pickup_points, grid):
     for point in pickup_points:
         pickups_queue.put(((point[0], point[1])))
         grid[point[0]][point[1]].make_pickups()
+        grid[point[0]][point[1]].bonus = 0
 
     return pickups_queue
 
@@ -260,7 +269,7 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
 Start simulation
 """
 
-maze, bonus_points, pickup_points = read_file("./maze/maze_6.txt")
+maze, bonus_points, pickup_points = read_file("./maze/maze_7.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
@@ -275,8 +284,9 @@ video = Video((WIDTH, HEIGHT))
 pygame.display.set_caption("Simulation of finding the way")
 clock = pygame.time.Clock()
 
-# main(SCREEN, maze, bonus_points, pickup_points, WIDTH, HEIGHT)
+video.destroy_png()
+main(SCREEN, maze, bonus_points, pickup_points, WIDTH, HEIGHT)
 
 # Build video from image.
-# video.make_mp4("maze_7")
+video.make_mp4("maze_6")
 video.destroy_png()
