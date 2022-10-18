@@ -129,7 +129,7 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
 
-    def draw_distance_map(self, screen):
+    def draw_heatmap(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
         s.set_alpha(self.alpha)                # alpha level
@@ -151,7 +151,7 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # if not wall
-        if not self.is_wall():            
+        if not self.is_wall() and not self.is_pickups():            
             screen.blit(self.normal_font.render(str(round(self.min_distance, 2)), True, (0, 0, 0)),
                             (self.x + self.size/4, self.y + self.size/4))
                 
@@ -198,15 +198,16 @@ def draw_grid(screen, rows, cols, width, height):
             pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
 
 
-def draw(screen, grid, rows, cols, width, height, heatmap=False):
+def draw(screen, grid, rows, cols, width, height, addtional_map = "None"):
     screen.fill(WHITE)
 
     for row in grid:
         for node in row:
-            if heatmap:
-                max_heat = util.max_heat(grid)
-                # update_heat_gradient(grid, max_heat)
-                node.draw_heatmap(screen)
+            if addtional_map != "None":
+                if addtional_map.lower() == "heat":
+                    node.draw_heatmap(screen)
+                else:
+                    node.draw_distance_map(screen)
             else:
                 node.draw(screen)
 
@@ -260,25 +261,25 @@ def merge_pickups_grid(pickup_points, grid):
 
     return pickups_queue
 
-def main(screen, maze, bonus_points, width, height):
+def main(screen, maze, bonus_points, pickup_points, width, height):
 
     grid = make_grid(ROWS, COLS)
 
     start = None
-    end = None
-    include_heatmap = True
+    end = None    
 
     start, end = merge_maze_grid(maze, grid)
     merge_bonus_grid(bonus_points, grid)
     merge_pickups_grid(pickup_points, grid)
-    util.update_grid(grid, bonus_points)
+    util.update_bonus_grid(grid, bonus_points)
+    util.update_distance_grid(grid, pickup_points)
 
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
     # wait()
     run = True
     while run:
-        draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
+        draw(screen, grid, ROWS, COLS, width, height, addtional_map='dis')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -310,7 +311,7 @@ def main(screen, maze, bonus_points, width, height):
 """
 Start simulation
 """
-maze_name = '5'
+maze_name = '6'
 maze, bonus_points, pickup_points = read_file("./maze/maze_" + maze_name + ".txt")
 
 ROWS = len(maze)
@@ -327,7 +328,7 @@ video = Video((WIDTH, HEIGHT))
 pygame.display.set_caption("Simulation of finding the way")
 clock = pygame.time.Clock()
 video.destroy_png()
-main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
+main(SCREEN, maze, bonus_points, pickup_points, WIDTH, HEIGHT)
 
 # Build video from image.
 video.make_mp4("maze_" + maze_name + "_heat")
