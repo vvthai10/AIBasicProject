@@ -311,11 +311,13 @@ stats:
 maze 8: -406
 maze 9: -472
 '''
+
+
 def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end, clock):
     def h_x(point):
-        if pickup_list: # ignore end while this are pick up point
+        if pickup_list:  # ignore end while this are pick up point
             return point.min_distance
-        else:    
+        else:
             return util.distance(point, end)
 
     def g_x(point, bonus_list=bonus_list):
@@ -327,17 +329,17 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end
 
     def heuristic(target):
         return h_x(target) + g_x(target)
-    
+
     def remove_pickup(grid, node, pickup_list):
         pickup_list.remove((node.y/util.SIZE, node.x/util.SIZE))
         node.reset()
         util.update_distance_grid(grid, pickup_list)
-        
-    def remove_bonus(grid, node, bonus_list):        
-        bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))            
+
+    def remove_bonus(grid, node, bonus_list):
+        bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
         node.reset()
         util.update_bonus_grid(grid, bonus_list)
-        
+
     def check_parent(leaf_node, node_to_check, parent_list, pos_root):
         child = leaf_node.get_pos()
         parent = parent_list.get(child)
@@ -358,7 +360,7 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end
     open.put((heuristic(start), start))
 
     while not open.empty():
-        value_heuristic, node = open.get()        
+        value_heuristic, node = open.get()
         pos = node.get_pos()
         if pos == end.get_pos():  # reach the end
             tmp_way = [pos]
@@ -377,8 +379,8 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end
             node.make_open()
 
         # check if reach bonus point
-        if util.check_bonus_list(node, bonus_list):                        
-            remove_bonus(grid,node,bonus_list)            
+        if util.check_bonus_list(node, bonus_list):
+            remove_bonus(grid, node, bonus_list)
 
             # find this part of the way
             tmp_way = []
@@ -399,13 +401,13 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end
             # reset queues
             parents.clear()
             open = PriorityQueue()
-            closed = []            
+            closed = []
             open.put((heuristic(node), node))
-                
+
         # check if reach bonus point
-        elif util.check_pickup_list(node, pickup_list):                                                
-            remove_pickup(grid, node,pickup_list)
-                        
+        elif util.check_pickup_list(node, pickup_list):
+            remove_pickup(grid, node, pickup_list)
+
             # find this part of the way
             tmp_way = []
             child = node.get_pos()
@@ -425,20 +427,21 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, start, end
             # reset queues
             parents.clear()
             open = PriorityQueue()
-            closed = []            
+            closed = []
             open.put((heuristic(node), node))
-            
+
         # open new node
-        for neighbor in node.neighbors:            
-            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor in closed:                
+        for neighbor in node.neighbors:
+            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor in closed:
                 value = heuristic(neighbor)
                 open.put((value, neighbor))
                 parents[neighbor.get_pos()] = pos
-        
+
         closed.append(node)
         clock.tick(FPS)
         draw()
     return False
+
 
 def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
     def h_x(point):
@@ -523,11 +526,11 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
 
         # open new node
         for neighbor in node.neighbors:
-            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor  in closed:
+            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor in closed:
                 value = heuristic(neighbor)
                 open.put((value, neighbor))
                 parents[neighbor.get_pos()] = pos
-        
+
         closed.append(node)
         clock.tick(FPS)
         draw()
