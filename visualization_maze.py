@@ -221,7 +221,7 @@ def merge_pickups_grid(pickup_points, grid):
 
     return pickups_queue
 #lưu đường đi ra khỏi mê cung thành file .png
-def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = None):
+def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = None, pickup = None, portal = None):
     """
     Args:
       1. matrix: The matrix read from the input file,
@@ -262,6 +262,13 @@ def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = Non
         plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
                     marker='P',s=100,color='green')
 
+    if(not pickup.empty()):
+        plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
+                    marker='!',s=100,color='blue')
+
+    if(not portal.empty()):
+        plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
+                    marker='O',s=100,color='pink')
     plt.scatter(start.col,-start.row,marker='*',
                 s=100,color='gold')
 
