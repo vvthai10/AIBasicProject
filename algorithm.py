@@ -1,5 +1,6 @@
 from queue import PriorityQueue
 import math
+import pygame
 
 FPS = 30
 
@@ -33,6 +34,10 @@ def algorithm_dfs(draw, grid, start, end, clock):
     stack.append(start.get_pos())
 
     while len(stack) != 0:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
         pos = stack.pop()
 
         if pos in path:
@@ -89,6 +94,10 @@ def algorithm_ucs(draw,grid,start,end,clock):
     priorityQueue[start.get_pos()] = 0
 
     while(len(priorityQueue) != 0):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
         pos = getItem(priorityQueue)
         cost = priorityQueue[pos]   # chi phi de toi diem hien tai co vi tri pos
         priorityQueue.pop(pos)      # xoa ra khoi hang doi     
@@ -143,6 +152,10 @@ def algorithm_bfs(draw, grid, start, end, clock):
     queue.append(start.get_pos())
 
     while len(queue) != 0:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
         pos = queue.pop(0)
 
         if pos in path:
@@ -203,6 +216,10 @@ def algorithm_greedy_bfs(draw, grid, start, end, clock):
     queue.put((heuristic_1(start, end), (start.get_pos())))
 
     while not queue.empty():
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
         value_heuristic, (x_pos, y_pos) = queue.get()
         pos = (x_pos, y_pos)
 
@@ -266,6 +283,10 @@ def algorithm_astar(draw, grid, start, end, clock):
     open.put(( 1 + euclid_dis(start, end), (start.get_pos())))
 
     while not open.empty():
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                
         f_prev, (x_cur, y_cur) = open.get()
 
         if(grid[x_cur][y_cur].is_end()):
@@ -303,132 +324,6 @@ def algorithm_astar(draw, grid, start, end, clock):
         draw()
     return [], 0
 
-
-# Cách 1: Dùng góc nhọn + điểm cao nhất -> Thất bại
-# Cách 2: ...
-# Cách 3: Dùng các điểm trong phạm vi giới hạn trong hình nhật từ điểm hiện tại đến kết thúc
-    #Lọc ra những điểm nằm cùng phía -> Sắp xếp xa dần điểm đầu, sẽ có 2 nữa trên dưới với đường phân cách là đường chéo hcn đầu cuối
-    # Sẽ dùng h_n tính khoảng cách từ nó tới đính và khoảng cách từ nó tới điểm gần đó + gần đó tới đích + bonus -> Nếu chi phí rẻ hơn thì đi ko thì thôi.
-# Sẽ tìm khoảng cách từ điểm hiện tại cho tới điểm thỏa mãn
-
-
-'''
-    # Sẽ chuyển thằng bonus_priorities thành priority queue
-    isCheckOther = True
-    bonus_queue = PriorityQueue()
-    for item_pri in bonus_priorities:
-        r, c, num_bonus = bonus_priorities[item_pri]
-        bonus_queue.put((item_pri,(r, c, num_bonus)))
-    while not bonus_queue.empty():
-        space_with_start, (r, c, num_bonus) = bonus_queue.get()
-
-        open = PriorityQueue()
-        cur_end = grid[r][c]
-
-        pos_start = (cur_start.get_pos()[0], cur_start.get_pos()[1])
-        pos_end = (r, c)
-
-        g[pos_start[0]][pos_start[1]] = grid[pos_start[0]][pos_start[1]].bonus
-        open.put(( g[pos_start[0]][pos_start[1]] + heuristic_1(cur_start, cur_end), (cur_start.get_pos())))
-        while not open.empty():
-            f_prev, (r, c) = open.get()
-
-            if (r, c) == pos_end :
-                print(num_bonus)
-                if isCheckOther:
-                    isCheckOther = False
-                    # Tới khi đến được 1 nút thuộc bonus ưu tiên thì tìm 1 điểm bên kia có thể đi được
-                    cur_start = cur_end
-                    isZero = False
-                    # Tìm cái điểm tiếp theo của điểm hiện tại, nếu hết thì tìm tới điểm kết thúc
-                    if not bonus_queue.empty():
-                        space_next_with_start, (r_next, c_next, num_bonus_next) = bonus_queue.get()
-                    else:
-                        isZero = True
-                        r_next, c_next = end.get_pos()
-                    # Tìm điểm thỏa mãn        
-                    for item_other in bonus_other:
-                        num_bonus_other = item_other
-                        (r_other, c_other) = bonus_other[item_other]
-                        if not (r_other, c_other) in closed:
-                            # Check điều kiên của hàm F (cur -> other) + (other -> next) + bonus_cur_new vs (cur -> next)
-                            l_cur_other = calc_space((r, c), (r_other, c_other))
-                            l_other_next = calc_space((r_other, c_other), (r_next, c_next))
-                            l_cur_next = calc_space((r, c), (r_next, c_next))
-
-                            if(l_cur_other + l_other_next + num_bonus_other <= l_cur_next):
-                                # Thêm ngược điểm mới vào với khoảng cách là sẽ mặc định nhỏ hơn điểm next 1 đơn vị để nó sắp lên đầu
-                                bonus_queue.put((10, (r_other, c_other, num_bonus_other)))
-                                break
-                        
-                    if not isZero:  bonus_queue.put((space_next_with_start, (r_next, c_next, num_bonus_next)))
-                    break
-                else:
-                    isCheckOther = True
-                    cur_start = cur_end
-                    break
-            
-
-            if not grid[r][c].is_start():
-                grid[r][c].make_open()
-
-            closed.append((r, c))
-            for neighbor in grid[r][c].neighbors:
-                # WARNING!!!!!!!!
-                r_new, c_new = neighbor.get_pos()
-                if not (r_new, c_new) in closed:
-                    g_n =  g[r][c] + grid[r_new][c_new].bonus
-                    g[r_new][c_new] = g_n
-                    h_n = heuristic_1(neighbor, cur_end) 
-                    f_n = g_n + h_n
-                    open.put((f_n, (r_new, c_new)))
-
-                    parents[(r_new, c_new)] = (r, c)
-
-            clock.tick(FPS)
-            draw()
-
-    open = PriorityQueue()
-    # g[cur_start[0]][cur_start[1]] = grid[cur_start[0]][cur_start[1]].bonus
-    open.put(( g[cur_start.get_pos()[0]][cur_start.get_pos()[1]] + heuristic_1(cur_start, end), (cur_start.get_pos())))
-    while not open.empty():
-        f_prev, (x_cur, y_cur) = open.get()
-
-        if(grid[x_cur][y_cur].is_end()):
-            pos_start = start.get_pos()
-
-            child = end.get_pos()
-            parent = parents[child]
-            while(parent != pos_start):
-                way.append(parent)
-                child = parent
-                parent = parents[child]
-
-                    
-            print(g[end.get_pos()[0]][end.get_pos()[1]])
-
-            reconstruct_path(way, grid, draw, clock)
-            return True
-        
-        if not grid[x_cur][y_cur].is_start():
-            grid[x_cur][y_cur].make_open()
-
-        closed.append((x_cur, y_cur))
-        for neighbor in grid[x_cur][y_cur].neighbors:
-            # WARNING!!!!!!!!
-            x_new, y_new = neighbor.get_pos()
-            if not (x_new, y_new) in closed:
-                g_n =  g[r][c] + grid[r_new][c_new].bonus
-                g[r_new][c_new] = g_n
-                h_n = heuristic_1(neighbor, end) 
-                f_n = g_n + h_n
-                open.put((f_n, (x_new, y_new)))
-
-                parents[(x_new, y_new)] = (x_cur, y_cur)
-        
-        clock.tick(FPS)
-        draw()
-'''
 
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
@@ -661,42 +556,3 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
         clock.tick(FPS)
         draw()
 
-
-# ============================== VERSION 1 =============================
-# ways_total = [] # lưu trữ cả những điểm đã bị pop ra
-# ways_true = []  # lưu trữ tuyến đường đi đúng đắn nhất
-
-# def DFS(point, moves, end):
-#   if point == end:
-#     ways_total.append(point)
-#     ways_true.append(point)
-#     check = True
-#     return True
-  
-#   ways_total.append(point)
-#   ways_true.append(point)
-
-#   check = False;
-
-#   point_up = (point[0] - 1, point[1])
-#   point_down = (point[0] + 1, point[1])
-#   point_left = (point[0], point[1] - 1)
-#   point_right = (point[0], point[1] + 1)
-#   if(not check and point_up in moves and ways_true.count(point_up) == 0):
-#     check = DFS(point_up, moves, end);
-#   if(not check and point_down in moves and ways_true.count(point_down)  == 0):
-#     check = DFS(point_down, moves, end);
-#   if(not check and point_left in moves and ways_true.count(point_left)  == 0):
-#     check = DFS(point_left, moves, end);
-#   if(not check and point_right in moves and ways_true.count(point_right)  == 0):
-#     check = DFS(point_right, moves, end);
-  
-#   if(not check): 
-#     # print(f"Remove point{point}\n")
-#     ways_true.pop()
-
-#   return check
-
-# def WaysFind():
-#     return ways_total, ways_true
-  

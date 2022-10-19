@@ -51,7 +51,7 @@ def run():
                 for node in row:
                     node.update_neighbors(grid)            
             
-            SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+            SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
             if(alg == "dfs"):
                 way, cost = algorithm_dfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
             elif(alg== "bfs"):
@@ -63,7 +63,7 @@ def run():
             else:
                 way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
             
-            dir_output = level[1] + "\\" + file.split(".")[0] + "\\" + alg
+            dir_output = level[0] + "\\" + file.split(".")[0] + "\\" + alg
             create_folder(dir_output)               
             write_file(dir_output + "\\" + alg + ".txt", cost )
             video.make_mp4(dir_output+ "\\" + alg)
@@ -87,7 +87,7 @@ Start simulation
 
 # print(WIDTH, HEIGHT)
 
-# SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+# SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
 video = Video((WIDTH, HEIGHT))
 pygame.display.set_caption("Simulation of finding the way")
 clock = pygame.time.Clock()
