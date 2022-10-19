@@ -280,48 +280,59 @@ def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = Non
 
 
 def run():
-    level, files = list_file()
+    levels, files = list_file()
 
-    no_bonus_alg = ["dfs","bfs","ucs","gbfs","astar"]
-    for file in files[level[1]]:
-        maze, bonus_points, pickup_point = read_file("./input/" + level[1] + "/" + file)
-        
-        ROWS = len(maze)
-        COLS = len(maze[0])
-        WIDTH = COLS * SIZE
-        HEIGHT = ROWS * SIZE
-        way = []
-        cost = 0
-        start = None
-        end = None
+    
+    for level in levels:
+        for file in files[level]:
+            maze, bonus_points, pickup_point = read_file("./input/" + level + "/" + file)
+            
+            ROWS = len(maze)
+            COLS = len(maze[0])
+            WIDTH = COLS * SIZE
+            HEIGHT = ROWS * SIZE
+            way = []
+            cost = 0
+            start = None
+            end = None
 
-        for alg in no_bonus_alg:
-            grid = make_grid(ROWS, COLS)
-            start, end = merge_maze_grid(maze, grid,ROWS,COLS)
-            bonus_queue = merge_bonus_grid(bonus_points, grid)
-            for row in grid:
-                for node in row:
-                    node.update_neighbors(grid)            
-            
-            SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-            if(alg == "dfs"):
-                way, cost = algorithm_dfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            elif(alg== "bfs"):
-                way,cost = algorithm_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            elif(alg == "ucs"):
-                way, cost = algorithm_ucs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            elif(alg == "gbfs"):
-                way, cost =algorithm_greedy_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            else:
-                way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            
-            dir_output = level[1] + "\\" + file.split(".")[0] + "\\" + alg
-            create_folder(dir_output)               
-            write_file(dir_output + "\\" + alg + ".txt", cost )
-            video.make_mp4(dir_output+ "\\" + alg)
-            video.destroy_png()
-            visualize_maze_by_image(maze,bonus_queue,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
-            pygame.quit()
+            algs = ["dfs","bfs","ucs","gbfs","astar"]
+            for alg in algs:
+                grid = make_grid(ROWS, COLS)
+                start, end = merge_maze_grid(maze, grid,ROWS,COLS)
+                bonus_queue = merge_bonus_grid(bonus_points, grid)
+                for row in grid:
+                    for node in row:
+                        node.update_neighbors(grid)            
+                
+                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+                if level == "level_1":
+                    if(alg == "dfs"):
+                        way, cost = algorithm_dfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
+                    elif(alg== "bfs"):
+                        way,cost = algorithm_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
+                    elif(alg == "ucs"):
+                        way, cost = algorithm_ucs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
+                    elif(alg == "gbfs"):
+                        way, cost =algorithm_greedy_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
+                    else:
+                        way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
+                elif level == "level_2":
+                    temp="level_2"
+                elif level == "level_3":
+                    temp="level_3"
+                elif level == "advance":
+                    temp="advance"
+                dir_output = level + "\\" + file.split(".")[0] + "\\" + alg
+                create_folder(dir_output)               
+                write_file(dir_output + "\\" + alg + ".txt", cost )
+                video.make_mp4(dir_output+ "\\" + alg)
+                video.destroy_png()
+                visualize_maze_by_image(maze,bonus_queue,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
+                pygame.quit()
+               
+
+
             
 
 
@@ -350,5 +361,5 @@ clock = pygame.time.Clock()
 run()
 #Build video from image.
 # video.make_mp4("maze")
-# video.destroy_png()
+#video.destroy_png()
 
