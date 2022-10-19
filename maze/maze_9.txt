@@ -45,7 +45,11 @@ x                x      x             +x
 xx   x      x       x+         x  x   xx
 x  x      x  +       +       x    +  x x
 x+  x  x      x    +   x             + x
+<<<<<<< HEAD
 x*x       x  +       +          x       
+=======
+x*x       x  +       +     S    x       
+>>>>>>> 3de82d9272a5c8646d51b7d522970d3bb81e99db
 x   + x         x     x       x +x   + x
 x           x     +         x         +x
 x      ++     x        x       x    x xx
