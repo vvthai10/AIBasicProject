@@ -336,9 +336,11 @@ def visualize_maze_by_image(matrix, bonus, pickup, portal, start, end, route: li
     """
     #1. Define walls and array of direction based on the route
     route.reverse()
-    route.append(start.get_pos())
+    if(route[len(route)- 1] != start.get_pos()):
+        route.append(start.get_pos())
     route.reverse()
-    route.append(end.get_pos())
+    if(route[len(route)- 1] != end.get_pos()):
+        route.append(end.get_pos())
     walls=[(i,j) for i in range(len(matrix)) for j in range(len(matrix[0])) if matrix[i][j]=='x']
 
     if route:
