@@ -443,13 +443,10 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_lis
                 value = heuristic(neighbor)
                 if portal_flag and neighbor_pos in portal_list:                            
                     destination_pos = portal_list[neighbor_pos]
-                    destination_node = grid[destination_pos[0]][destination_pos[1]]
-                    open.put((value, destination_node))
-                    parents[destination_node.get_pos()] = pos
-                    # maybe des = neighbor
-                else:                    
-                    open.put((value, neighbor))
-                    parents[neighbor.get_pos()] = pos
+                    neighbor = grid[destination_pos[0]][destination_pos[1]]                                                            
+                    neighbor_pos = neighbor.get_pos()
+                open.put((value, neighbor))
+                parents[neighbor.get_pos()] = pos
 
         closed.append(node)
         clock.tick(FPS)

@@ -141,6 +141,9 @@ class Node:
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
+        if not self.is_wall() and self.is_portal():
+            screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
+                        (self.x + self.size/8, self.y + self.size/4))
 
     def draw_heatmap(self, screen):
         self.change_alpha()
@@ -326,7 +329,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
     # wait()
-    addtional_map = 'all'
+    addtional_map = 'none'
     run = True
     while run:
         draw(screen, grid, ROWS, COLS, width, height, addtional_map)
