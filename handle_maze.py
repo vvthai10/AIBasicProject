@@ -1,3 +1,5 @@
+import pygame
+from init import *
 from contextlib import nullcontext
 from copy import copy
 from pickle import TRUE
@@ -9,35 +11,9 @@ import math
 import random
 from handle_file_maze import *
 from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar
-from make_video import Video
-import matplotlib.pyplot as plt
-import copy
-WIDTH = 800
-HEIGHT = 600
-FPS = 10
+from init import *
+from handle_visualize import make_image, Video
 
-RED = (255, 0, 0)
-GREEN = (144, 229, 150)
-BLUE = (51, 143, 165)
-YELLOW = (255, 255, 0)
-WHITE = (255, 255, 255)
-BLACK = (56, 55, 56)
-PURPLE = (175, 117, 173)
-ORANGE = (234, 194 ,84)
-GREY = (126,126,121)
-TURQUOISE = (47, 66, 206)
-
-# Build all need to visualization
-"""
-Description: Node is cell in matrix, it has another state with different color:
-- White: Can go
-- Black: Wall
-- Orange: Start
-- Turquoise: End
-- Green: Process find way
-- Purple: Correct way
-- Yellow: Bonus point
-"""
 class Node:
     def __init__(self, row, col, size, total_rows, total_cols):
         self.costs = {}   #cost from this node to near node
@@ -52,7 +28,6 @@ class Node:
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
-        self.parents = []
 
 
     def change_alpha(self):
@@ -165,7 +140,7 @@ def draw_grid(screen, rows, cols, width, height):
         for j in range(cols):
             pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
 
-def draw(screen, grid, rows, cols, width, height):
+def draw(screen, grid, rows, cols, width, height, video):
     screen.fill(WHITE)
     
     for row in grid:
@@ -221,134 +196,3 @@ def merge_pickups_grid(pickup_points, grid):
 
     return pickups_queue
 #lưu đường đi ra khỏi mê cung thành file .png
-def visualize_maze_by_image(matrix, bonus, start, end, route: list,saveDir = None):
-    """
-    Args:
-      1. matrix: The matrix read from the input file,
-      2. bonus: The array of bonus points,
-      3. start, end: The starting and ending points,
-      4. route: The route from the starting point to the ending one, defined by an array of (x, y), e.g. route = [(1, 2), (1, 3), (1, 4)]
-    """
-    #1. Define walls and array of direction based on the route
-    route.reverse()
-    route.append(start.get_pos())
-    route.reverse()
-    route.append(end.get_pos())
-    walls=[(i,j) for i in range(len(matrix)) for j in range(len(matrix[0])) if matrix[i][j]=='x']
-
-    if route:
-        direction=[]
-        for i in range(1,len(route)):
-            if route[i][0]-route[i-1][0]>0:
-                direction.append('v') #^
-            elif route[i][0]-route[i-1][0]<0:
-                direction.append('^') #v        
-            elif route[i][1]-route[i-1][1]>0:
-                direction.append('>')
-            else:
-                direction.append('<')
-
-        direction.pop(0)
-
-    #2. Drawing the map
-    ax=plt.figure(dpi=100).add_subplot(111)
-
-    for i in ['top','bottom','right','left']:
-        ax.spines[i].set_visible(False)
-
-    plt.scatter([i[1] for i in walls],[-i[0] for i in walls],
-                marker='X',s=100,color='black')
-    if(not bonus.empty()):
-        plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
-                    marker='P',s=100,color='green')
-
-    plt.scatter(start.col,-start.row,marker='*',
-                s=100,color='gold')
-
-    if route:
-        for i in range(len(route)-2):
-            plt.scatter(route[i+1][1],-route[i+1][0],
-                        marker=direction[i],color='silver')
-
-    plt.text(end.col,-end.row,'EXIT',color='red',
-         horizontalalignment='center',
-         verticalalignment='center')
-    plt.xticks([])
-    plt.yticks([])
-    plt.savefig(saveDir + ".png")
-    
-
-
-def run():
-    level, files = list_file()
-
-    no_bonus_alg = ["dfs","bfs","ucs","gbfs","astar"]
-    for file in files[level[1]]:
-        maze, bonus_points, pickup_point = read_file("./input/" + level[1] + "/" + file)
-        
-        ROWS = len(maze)
-        COLS = len(maze[0])
-        WIDTH = COLS * SIZE
-        HEIGHT = ROWS * SIZE
-        way = []
-        cost = 0
-        start = None
-        end = None
-
-        for alg in no_bonus_alg:
-            grid = make_grid(ROWS, COLS)
-            start, end = merge_maze_grid(maze, grid,ROWS,COLS)
-            bonus_queue = merge_bonus_grid(bonus_points, grid)
-            for row in grid:
-                for node in row:
-                    node.update_neighbors(grid)            
-            
-            SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-            if(alg == "dfs"):
-                way, cost = algorithm_dfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            elif(alg== "bfs"):
-                way,cost = algorithm_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            elif(alg == "ucs"):
-                way, cost = algorithm_ucs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            elif(alg == "gbfs"):
-                way, cost =algorithm_greedy_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            else:
-                way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT), grid, start, end, clock)
-            
-            dir_output = level[1] + "\\" + file.split(".")[0] + "\\" + alg
-            create_folder(dir_output)               
-            write_file(dir_output + "\\" + alg + ".txt", cost )
-            video.make_mp4(dir_output+ "\\" + alg)
-            video.destroy_png()
-            visualize_maze_by_image(maze,bonus_queue,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
-            pygame.quit()
-            
-
-
-"""
-Start simulation
-"""
-
-# bonus_points, maze = read_file("./maze/maze_3.txt")
-
-# ROWS = len(maze)
-# COLS = len(maze[0])
-
-SIZE = 32
-
-# WIDTH = COLS * SIZE
-# HEIGHT = ROWS * SIZE
-
-# print(WIDTH, HEIGHT)
-
-# SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-video = Video((WIDTH, HEIGHT))
-pygame.display.set_caption("Simulation of finding the way")
-clock = pygame.time.Clock()
-
-#main(SCREEN, maze, bonus_points, WIDTH, HEIGHT)
-run()
-#Build video from image.
-# video.make_mp4("maze")
-# video.destroy_png()
-
