@@ -492,6 +492,7 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_lis
             tmp_way.reverse()
             way = way + tmp_way
             
+            way.reverse()   #phục vụ cho việc vẽ ra file .png
             return reconstruct_path(way, grid, draw, clock)
         elif node != start:
             node.make_open()
@@ -614,6 +615,7 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
             tmp_way.reverse()
             way = way + tmp_way
             
+            way.reverse()   #phục vụ cho việc vẽ ra file .png
             return reconstruct_path(way, grid, draw, clock)
         elif node != start:
             node.make_open()
