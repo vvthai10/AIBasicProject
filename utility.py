@@ -30,7 +30,12 @@ def minimal_congif(config, is_distance=False):
         return True
 
 
-def mark_trace(grid, source_node, root_value, is_distance=False):
+def mark_trace(grid, source_node, root_value, portal_list, is_distance=False):
+    if len(portal_list):
+        using_portal = True
+    else:        
+        using_portal = False
+    
     if is_distance:
         source_node.min_distance += root_value
     else:
@@ -39,7 +44,7 @@ def mark_trace(grid, source_node, root_value, is_distance=False):
 
     queue = Queue()
     config = root_value
-    queue.put((config, source_node))
+    queue.put((config, source_node)) # edit if start on portal
 
     while not queue.empty():
         (config, point) = queue.get()
@@ -52,15 +57,29 @@ def mark_trace(grid, source_node, root_value, is_distance=False):
         if not minimal_congif(new_config, is_distance):
             point.update_neighbors(grid)
             for neighbor in point.neighbors:
-                # closed node won't gain heat val
+                # closed node won't be update
                 if is_distance:
-                    if not neighbor in closed and not neighbor.is_pickups():
+                    if not neighbor in closed and not neighbor.is_pickups():                        
                         update_node(neighbor, new_config, is_distance)
-                        queue.put((new_config, neighbor))
+                        neighbor_pos = neighbor.get_pos()
+                        if using_portal and neighbor_pos in portal_list:                            
+                            destination_pos = portal_list[neighbor_pos]
+                            destination_node = grid[destination_pos[0]][destination_pos[1]]
+                            update_node(destination_node, new_config, is_distance)
+                            queue.put((new_config, destination_node))
+                        else:
+                            queue.put((new_config, neighbor))
                 else:
                     if not neighbor in closed and not neighbor.is_bonus():
                         update_node(neighbor, new_config, is_distance)
-                        queue.put((new_config, neighbor))
+                        neighbor_pos = neighbor.get_pos()
+                        if using_portal and neighbor_pos in portal_list:                            
+                            destination_pos = portal_list[neighbor_pos]
+                            destination_node = grid[destination_pos[0]][destination_pos[1]]
+                            update_node(destination_node, new_config, is_distance)
+                            queue.put((new_config, destination_node))
+                        else:
+                            queue.put((new_config, neighbor))
 
         closed.append(point)
 
@@ -85,7 +104,7 @@ def max_heat(grid):
     return ans
 
 
-def update_bonus_grid(grid, point_list):
+def update_bonus_grid(grid, point_list, portal_list):        
     # clone bonus_list
     tmpQ = point_list.copy()
 
@@ -99,10 +118,10 @@ def update_bonus_grid(grid, point_list):
         pos_x, pos_y, value = tmpQ[0]
         tmpQ.pop(0)
         point = grid[pos_x][pos_y]
-        mark_trace(grid, point, value)
+        mark_trace(grid, point, value, portal_list)
 
 
-def update_distance_grid(grid, point_list):
+def update_distance_grid(grid, point_list, portal_list):
     # clone bonus_list
     tmpQ = point_list.copy()
 
@@ -116,7 +135,7 @@ def update_distance_grid(grid, point_list):
         pos_x, pos_y = tmpQ[0]
         tmpQ.pop(0)
         point = grid[pos_x][pos_y]
-        mark_trace(grid, point, 0, is_distance=True)
+        mark_trace(grid, point, 0, portal_list, is_distance=True)
 
 
 def check_bonus_list(node, point_list):
@@ -125,3 +144,4 @@ def check_bonus_list(node, point_list):
 
 def check_pickup_list(node, point_list):
     return (node.y/SIZE, node.x/SIZE) in point_list
+
