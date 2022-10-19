@@ -104,7 +104,7 @@ def max_heat(grid):
     return ans
 
 
-def update_bonus_grid(grid, point_list, portal_list):        
+def update_bonus_grid(grid, point_list, portal_list =[]):        
     # clone bonus_list
     tmpQ = point_list.copy()
 
