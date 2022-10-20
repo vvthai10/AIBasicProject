@@ -4,17 +4,27 @@ import os
 
 def read_file(file_name: str = 'maze.txt'):
   f=open(file_name,'r')
-  n_bonus_points, n_pickup_points, n_portal = map(int, next(f)[:-1].split(' '))
+  # n_bonus_points, n_pickup_points, n_portal = map(int, next(f)[:-1].split(' '))
+  n_points, n_portal = map(int, next(f)[:-1].split(' '))
+  points = []
+  portals = {}
+  for i in range(n_points):
+    x, y, reward = map(int, next(f)[:-1].split(' '))
+    points.append((x, y, reward))
+
+  # for i in range(n_pickup_points):
+  #   x, y = map(int, next(f)[:-1].split(' '))
+  #   pickup_points.append((x, y))
+
+  
   bonus_points = []
   pickup_points = []
-  portals = {}
-  for i in range(n_bonus_points):
-    x, y, reward = map(int, next(f)[:-1].split(' '))
-    bonus_points.append((x, y, reward))
 
-  for i in range(n_pickup_points):
-    x, y = map(int, next(f)[:-1].split(' '))
-    pickup_points.append((x, y))
+  for point in points:
+    if point[2] == 0:
+      pickup_points.append((point[0], point[1]))
+    else:
+      bonus_points.append((point[0], point[1], point[2]))
 
   for i in range(n_portal):
     pos1, pos2 = map(str, next(f)[:-1].split('-'))    
