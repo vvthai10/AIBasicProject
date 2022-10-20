@@ -247,8 +247,8 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
                     # check = algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     # check = algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
                     # check = algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # check = algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
-                    check = algorithm_bonus_pickup_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, pickups_queue, start, end, clock)
+                    check = algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
+                    # check = algorithm_bonus_pickup_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, pickups_queue, start, end, clock)
                     print(check)
 
                 
@@ -269,7 +269,7 @@ def main(screen, maze, bonus_points, pickup_points, width, height):
 Start simulation
 """
 
-maze, bonus_points, pickup_points = read_file("./maze/maze_9.txt")
+maze, bonus_points, pickup_points = read_file("./maze/maze_6.txt")
 
 ROWS = len(maze)
 COLS = len(maze[0])
