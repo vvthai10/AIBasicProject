@@ -1,21 +1,39 @@
 from importlib.resources import path
 import os
 
-
-def read_file(file_name: str = 'maze.txt'):
-  f=open(file_name,'r')
-  # n_bonus_points, n_pickup_points, n_portal = map(int, next(f)[:-1].split(' '))
-  n_points, n_portal = map(int, next(f)[:-1].split(' '))
+def read_file_normal(file_name: str = 'maze.txt'):
+  f = open(file_name,'r')
+  n_points = int(next(f)[:-1])
   points = []
-  portals = {}
+  
   for i in range(n_points):
     x, y, reward = map(int, next(f)[:-1].split(' '))
     points.append((x, y, reward))
+  
+  bonus_points = []
+  pickup_points = []
 
-  # for i in range(n_pickup_points):
-  #   x, y = map(int, next(f)[:-1].split(' '))
-  #   pickup_points.append((x, y))
+  for point in points:
+    if point[2] == 0:
+      pickup_points.append((point[0], point[1]))
+    else:
+      bonus_points.append((point[0], point[1], point[2]))
+    
+  text=f.read()
+  maze=[list(i) for i in text.splitlines()]
+  f.close()
 
+  return maze, bonus_points, pickup_points
+
+def read_file_advance(file_name: str = 'maze.txt'):
+  f = open(file_name,'r')
+  n_points, n_portal = map(int, next(f)[:-1].split(' '))
+  points = []
+  portals = {}
+  
+  for i in range(n_points):
+    x, y, reward = map(int, next(f)[:-1].split(' '))
+    points.append((x, y, reward))
   
   bonus_points = []
   pickup_points = []
@@ -38,8 +56,6 @@ def read_file(file_name: str = 'maze.txt'):
   f.close()
 
   return maze, bonus_points, pickup_points, portals
-
-
 
 def write_file(file_name, cost = 0):
     f = open(DIR_OUTPUT + file_name,'w')
