@@ -535,7 +535,7 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
                     
             print(g[end.get_pos()[0]][end.get_pos()[1]])
 
-            
+            print("End path")
             return reconstruct_path(way, grid, draw, clock)
         
         if not grid[x_cur][y_cur].is_start():

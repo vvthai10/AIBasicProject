@@ -102,6 +102,17 @@ class Node:
         else:
             self.alpha = 120
 
+    def draw_portal(self, screen):
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))
+        # if not wall
+        if not self.is_wall() and self.is_portal():
+            screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
+                        (self.x + self.size/8, self.y + self.size/4))
+
     def draw(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect

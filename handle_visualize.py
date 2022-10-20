@@ -19,6 +19,7 @@ def make_image(matrix, bonus, pickup, portal, start, end, route: list,saveDir = 
       4. route: The route from the starting point to the ending one, defined by an array of (x, y), e.g. route = [(1, 2), (1, 3), (1, 4)]
     """
     #1. Define walls and array of direction based on the route
+    print(route)
     route.reverse()
     if(route[len(route)- 1] != start.get_pos()):
         route.append(start.get_pos())
