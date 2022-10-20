@@ -10,7 +10,7 @@ from handle_file_maze import *
 from algorithm import algorithm_bonus_astar, algorithm_bonus_pickup_astar, algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar
 from make_video import Video
 import matplotlib.pyplot as plt
-from handle_file_maze import read_file
+from handle_file_maze import *
 import algorithm as algo
 from make_video import Video
 import utility as util
@@ -394,11 +394,17 @@ def visualize_maze_by_image(matrix, bonus, pickup, portal, start, end, route: li
 
 def run():
     levels, files = list_file()
-
+    bonus_points = []
+    pickup_points = []
+    portal_points = []
     
     for level in levels:
         for file in files[level]:
-            maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
+            if(level == "advance"):
+                maze, bonus_points, pickup_points, portal_points = read_file_advance("./input/" + level + "/" + file)
+            else:
+                maze, bonus_points, pickup_points = read_file_normal("./input/" + level + "/" + file)
+            
             
             ROWS = len(maze)
             COLS = len(maze[0])
@@ -468,7 +474,11 @@ def run():
                     write_file(dir_output + "\\" + alg + ".txt", cost )
                     video.make_mp4(dir_output+ "\\" + alg)
                     video.destroy_png()
-                    maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
+                    if(level == "advance"):
+                        maze, bonus_points, pickup_points, portal_points = read_file_advance("./input/" + level + "/" + file)
+                    else:
+                        maze, bonus_points, pickup_points = read_file_normal("./input/" + level + "/" + file)
+            
                     visualize_maze_by_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
                 pygame.quit()
                
