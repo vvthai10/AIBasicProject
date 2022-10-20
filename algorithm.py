@@ -1,8 +1,7 @@
 from queue import PriorityQueue
 import math
 import pygame
-
-FPS = 30
+from init import *
 
 def reconstruct_path(way, grid, draw, clock):
     way.reverse()
@@ -324,7 +323,6 @@ def algorithm_astar(draw, grid, start, end, clock):
         draw()
     return [], 0
 
-
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
     def check_with_line(point, start, end):
@@ -556,3 +554,372 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
         clock.tick(FPS)
         draw()
 
+def algorithm_bonus_pickup_astar(draw, grid, bonus, pickups, start, end, clock):
+    WAYS_TOTAL = []
+
+    def check_points_in_area(top, down, point, approxi):
+        max_r = max(top[0], down[0]) + approxi
+        min_r = min(top[0], down[0]) - approxi
+        max_c = max(top[1], down[1]) + approxi
+        min_c = min(top[1], down[1]) - approxi
+
+        # print(f"check {point} in range {top} and {down}")
+        if point[0] in range(min_r, max_r) and point[1] in range(min_c, max_c):
+            return True
+
+        return False
+
+    def calc_space_2_points(A, B):
+        return math.sqrt((A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2 )
+
+    def get_points_areas():
+        end_pos = end.get_pos()
+        start_pos = start.get_pos()
+
+        # Phạm vi khu vực 1: Start => góc dưới ngược với góc của điểm end
+        r_bottom = (len(grid) - 1) if (end_pos[0] < start_pos[0]) else 0
+        c_bottom = (len(grid[0])  - 1) if (end_pos[1] == 0) else 0
+
+        # Phạm vi khu vực 1: Start => góc trên ngược với góc của điểm end
+        r_top = (len(grid) - 1) if (end_pos[0] > start_pos[0]) else 0
+        c_top = (len(grid[0])  - 1) if (end_pos[1] == 0) else 0
+
+        # Phạm vi 3 là start -> center
+        # Phạm vi 4 là center -> end
+        c_center = (start_pos[1] + end_pos[1]) // 2
+
+        # Sắp xếp các điêm từ gần đến xa
+        pickups_1 = PriorityQueue()
+        bonus_1 = PriorityQueue()
+
+        # Sắp xếp từ gần tới xa
+        pickups_2 = PriorityQueue()
+        bonus_2 = PriorityQueue()
+
+        # Sắp xếp từ start -> center
+        pickups_3 = PriorityQueue()
+        bonus_3 = PriorityQueue()
+
+        # Sắp xếp từ center -> end
+        pickups_4 = PriorityQueue()
+        bonus_4 = PriorityQueue()
+
+
+        while not pickups.empty():
+            (r_cur, c_cur) = pickups.get()
+            if check_points_in_area(start_pos, (r_bottom, c_bottom), (r_cur, c_cur), 0):
+                pickups_1.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+            elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
+                pickups_2.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+            elif check_points_in_area((len(grid) - 1, start_pos[1]), (0, c_center), (r_cur, c_cur), 0):
+                pickups_3.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+            else:
+                pickups_4.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+
+        while not bonus.empty():
+            value, (r_cur, c_cur) = bonus.get()
+            if check_points_in_area(start_pos, (r_bottom, c_bottom), (r_cur, c_cur), 0):
+                bonus_1.put((value, (r_cur, c_cur)))
+            elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
+                bonus_2.put((value, (r_cur, c_cur)))
+            elif check_points_in_area((len(grid) - 1, start_pos[1]), (0, c_center), (r_cur, c_cur), 0):
+                bonus_3.put((value, (r_cur, c_cur)))
+            else:
+                bonus_4.put((value, (r_cur, c_cur)))
+        
+        '''
+        while not bonus_1.empty():
+            value, (r, c) = bonus_1.get()
+            print(f"Bonus 1 value{value}, Pos: {(r, c)}")
+        while not bonus_2.empty():
+            value, (r, c) = bonus_2.get()
+            print(f"Bonus 2 value{value}, Pos: {(r, c)}")
+        while not bonus_3.empty():
+            value, (r, c) = bonus_3.get()
+            print(f"Bonus 3 value{value}, Pos: {(r, c)}")
+        while not bonus_4.empty():
+            value, (r, c) = bonus_4.get()
+            print(f"Bonus 4 value{value}, Pos: {(r, c)}")
+        '''
+
+        return pickups_1, pickups_2, pickups_3, pickups_4, bonus_1, bonus_2, bonus_3, bonus_4 
+
+    def clean_path_parents_is_used():
+        parents = []
+        for point in closed:
+            if grid[point[0]][point[1]].is_open() :
+                closed.remove(point)
+
+    def handle_pickups(pickups, bonus, start_cur_pos, end_cur_pos ):
+        while not pickups.empty():
+            space, (end_cur_pos) = pickups.get()
+            
+            # Đầu tiên kiểm tra có điểm bonus nào trong khoảng này mà kc từ start -> pickup <= start -> bonus + bonus -> pickup + value
+            backup_bonus = PriorityQueue()
+            while not bonus.empty():
+                value, (bonus_pos) = bonus.get()
+                if check_points_in_area(start_cur_pos, end_cur_pos, bonus_pos, 2):
+                    start_pickup = calc_space_2_points(start_cur_pos, end_cur_pos)
+                    start_bonus = calc_space_2_points(start_cur_pos, bonus_pos)
+                    bonus_pickup = calc_space_2_points(bonus_pos, end_cur_pos)
+
+                    # Nếu này là điểm được chọn
+                    # print(f"1 {grid[bonus_pos[0]][bonus_pos[1]].bonus}")
+                    if start_pickup <= start_bonus + bonus_pickup + grid[bonus_pos[0]][bonus_pos[1]].bonus:
+                        # print(f"Choose bonus: {bonus_pos}")
+                        pickups.put((space, end_cur_pos))
+                        end_cur_pos = bonus_pos
+                        while not backup_bonus.empty():
+                            v, (r, c) = backup_bonus.get()
+                            bonus.put((v, (r, c)))
+                        break
+                    else:
+                        backup_bonus.put((value, bonus_pos))
+                else:
+                    backup_bonus.put((value, bonus_pos))
+            
+            while not backup_bonus.empty():
+                v, (r, c) = backup_bonus.get()
+                bonus.put((v, (r, c)))  
+
+            opens = PriorityQueue()
+            g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            g_n = g[start_cur_pos[0]][start_cur_pos[1]]
+            h_n = heuristic_1(start_cur_pos, end_cur_pos)
+            f_n = g_n + h_n
+            opens.put((f_n, start_cur_pos))
+
+            while not opens.empty():
+                f_prev, (cur_pos) = opens.get()
+                # print(f"Start with pos: {cur_pos}")
+                
+                closed.append(cur_pos)
+
+                if cur_pos == end_cur_pos:
+                    # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
+                    child = end_cur_pos
+                    parent = parents[child]
+                    ways = []
+                    ways.append(child)
+                    while(parent != start_cur_pos):
+                        ways.append(parent)
+                        child = parent
+                        parent = parents[child]
+                    ways.append(start_cur_pos)
+                    ways.reverse()
+                    WAYS_TOTAL.extend(ways)
+                    clean_path_parents_is_used()
+                    start_cur_pos = end_cur_pos
+                    break
+                
+                # Kiểm tra điểm đang đi có đang là bonus không
+                backup_bonus = PriorityQueue()
+                while not bonus.empty():
+                    v, (r, c) = bonus.get()
+                    if (r, c) != cur_pos:
+                        backup_bonus.put((v, (r, c))) 
+                    # else:
+                    #     print(f"Cur pos {(r, c)} is bonus")
+                
+                while not backup_bonus.empty():
+                    v, (r, c) = backup_bonus.get()
+                    bonus.put((v, (r, c))) 
+
+                backup_bonus = PriorityQueue()
+                while not pickups.empty():
+                    v, (r, c) = pickups.get()
+                    if (r, c) != cur_pos:
+                        backup_bonus.put((v, (r, c))) 
+                    # else:
+                    #     print(f"Cur pos {(r, c)} is pickup")
+
+                while not backup_bonus.empty():
+                    v, (r, c) = backup_bonus.get()
+                    pickups.put((v, (r, c))) 
+
+                grid[cur_pos[0]][cur_pos[1]].make_open()
+
+                for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
+                    # WARNING!!!!!!!!
+                    new_pos = neighbor.get_pos()
+                    if not new_pos in closed:
+                        # print(f"\tAdd neighbor {new_pos}")
+                        # NOTE: g[r][c].get_bonus()
+                        g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        g[new_pos[0]][new_pos[1]] = g_n
+                        h_n = heuristic_1(new_pos, end_cur_pos) 
+                        f_n = g_n + h_n
+                        opens.put((f_n, new_pos))
+
+                        grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+                        parents[new_pos] = cur_pos
+                
+                clock.tick(FPS)
+                draw()
+        return start_cur_pos, end_cur_pos
+
+    def heuristic_1(neighbor, end):
+        x1, y1 = neighbor
+        x2, y2 = end
+
+        return (x1 - x2) ** 2 + (y1 - y2) ** 2
+
+    def heuristic_2(neighbor, end):
+        x1, y1 = neighbor
+        x2, y2 = end
+
+        return abs(x1-x2) + abs(y1-y2)
+
+    pickups_1, pickups_2, pickups_3, pickups_4, bonus_1, bonus_2, bonus_3, bonus_4  = get_points_areas()
+
+    opens = PriorityQueue()
+    closed = []
+    parents = {}
+
+    # Tính toán hàm g
+    g = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
+
+    start_pos = start.get_pos()
+    end_pos = end.get_pos()
+
+    start_cur_pos = start_pos
+    end_cur_pos = None
+
+    start_cur_pos, end_cur_pos = handle_pickups(pickups_1, bonus_1, start_cur_pos, end_cur_pos)
+    # print(f"Finish 1: {start_cur_pos} and {end_cur_pos}")
+    start_cur_pos, end_cur_pos = handle_pickups(pickups_2, bonus_2, start_cur_pos, end_cur_pos)
+    # print(f"Finish 2: {start_cur_pos} and {end_cur_pos}")
+    start_cur_pos, end_cur_pos = handle_pickups(pickups_3, bonus_3, start_cur_pos, end_cur_pos)
+    # print(f"Finish 3: {start_cur_pos} and {end_cur_pos}")
+    start_cur_pos, end_cur_pos = handle_pickups(pickups_4, bonus_4, start_cur_pos, end_cur_pos)
+    # print(f"Finish 4: {start_cur_pos} and {end_cur_pos}")
+
+    # Từ cur -> end + các điểm bonus có thể ăn được
+    # Sẽ check trong bonus_4 thôi và trong cái diện tích giới hạn
+
+    # clean_path_is_used()
+    bonus_other = PriorityQueue()
+    end_cur_pos = end_pos
+
+    while not bonus_4.empty():
+        value, (bonus_pos) = bonus_4.get()
+        # print(value)
+        if check_points_in_area(start_cur_pos, end_pos, bonus_pos, 2):
+            bonus_other.put((calc_space_2_points(start_cur_pos, bonus_pos), value, bonus_pos))
+
+    while not bonus_other.empty():
+        space, value, (bonus_pos) = bonus_other.get()
+        
+        len_1 = calc_space_2_points(start_cur_pos, end_pos)
+        len_2 = value + calc_space_2_points(start_cur_pos, bonus_pos) + calc_space_2_points(bonus_pos, end_pos)
+
+        if len_1 <= len_2:
+            end_cur_pos = bonus_pos
+            opens = PriorityQueue()
+            g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            g_n = g[start_cur_pos[0]][start_cur_pos[1]]
+            h_n = heuristic_1(start_cur_pos, end_cur_pos)
+            f_n = g_n + h_n
+            opens.put((f_n, start_cur_pos))
+
+            while not opens.empty():
+                f_prev, (cur_pos) = opens.get()
+                # print(f"Start with pos: {cur_pos}")
+                
+                closed.append(cur_pos)
+
+                if cur_pos == end_cur_pos:
+                    # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
+                    child = end_cur_pos
+                    parent = parents[child]
+                    ways = []
+                    ways.append(child)
+                    while(parent != start_cur_pos):
+                        ways.append(parent)
+                        child = parent
+                        parent = parents[child]
+                    ways.append(start_cur_pos)
+                    ways.reverse()
+                    WAYS_TOTAL.extend(ways)
+                    clean_path_parents_is_used()
+                    start_cur_pos = end_cur_pos
+                    break
+                
+                grid[cur_pos[0]][cur_pos[1]].make_open()
+
+                for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
+                    # WARNING!!!!!!!!
+                    new_pos = neighbor.get_pos()
+                    if not new_pos in closed:
+                        # print(f"\tAdd neighbor {new_pos}")
+                        # NOTE: g[r][c].get_bonus()
+                        g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        g[new_pos[0]][new_pos[1]] = g_n
+                        h_n = heuristic_1(new_pos, end_cur_pos) 
+                        f_n = g_n + h_n
+                        opens.put((f_n, new_pos))
+
+                        parents[new_pos] = cur_pos
+                        grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+                
+                clock.tick(FPS)
+                draw()
+        
+    # Từ điểm hiện tại đến cuối đường
+    end_cur_pos = end_pos
+    opens = PriorityQueue()
+    g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+    g_n = g[start_cur_pos[0]][start_cur_pos[1]]
+    h_n = heuristic_1(start_cur_pos, end_cur_pos)
+    f_n = g_n + h_n
+    opens.put((f_n, start_cur_pos))
+
+    while not opens.empty():
+        f_prev, (cur_pos) = opens.get()
+        # print(f"Start with pos: {cur_pos}")
+        
+        closed.append(cur_pos)
+
+        if cur_pos == end_cur_pos:
+            # start_cur_pos = end_cur_pos
+            # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
+            child = end_pos
+            parent = parents[child]
+            ways = []
+            ways.append(child)
+            while(parent != start_cur_pos):
+                ways.append(parent)
+                child = parent
+                parent = parents[child]
+            ways.append(start_cur_pos)
+            ways.reverse()
+            WAYS_TOTAL.extend(ways)
+            # clean_path_parents_is_used()
+
+                    
+            # print(WAYS_TOTAL)
+            WAYS_TOTAL.reverse()
+            reconstruct_path(WAYS_TOTAL, grid, draw, clock)
+            print(g[end_pos[0]][end_pos[1]])
+            return True
+        
+        if cur_pos != start_pos and cur_pos != end_pos:
+            grid[cur_pos[0]][cur_pos[1]].make_open()
+
+        for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
+            # WARNING!!!!!!!!
+            new_pos = neighbor.get_pos()
+            if not new_pos in closed:
+                # print(f"\tAdd neighbor {new_pos}")
+                # NOTE: g[r][c].get_bonus()
+                g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                g[new_pos[0]][new_pos[1]] = g_n
+                h_n = heuristic_1(new_pos, end_cur_pos) 
+                f_n = g_n + h_n
+                opens.put((f_n, new_pos))
+
+                parents[new_pos] = cur_pos
+                grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+        
+        clock.tick(FPS)
+        draw()
