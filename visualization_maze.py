@@ -468,6 +468,7 @@ def run():
                     write_file(dir_output + "\\" + alg + ".txt", cost )
                     video.make_mp4(dir_output+ "\\" + alg)
                     video.destroy_png()
+                    maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
                     visualize_maze_by_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
                 pygame.quit()
                
