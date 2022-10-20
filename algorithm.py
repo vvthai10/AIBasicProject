@@ -1,7 +1,8 @@
-from queue import PriorityQueue, Queue
 from http.client import FOUND
 import math
 import pygame
+from queue import PriorityQueue, Queue
+
 from init import *
 import utility as util
 from dis import dis
@@ -326,7 +327,7 @@ def algorithm_astar(draw, grid, start, end, clock):
         draw()
     return [], 0
 
-def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
+def algorithm_handle_bonus(draw, grid, bonus, start, end, clock):
 
     def check_with_line(point, start, end):
         a = (end[1] - start[1]) / (end[0] - start[0])
@@ -390,7 +391,7 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
             up_bonus = dict(sorted(up_bonus.items()))
             down_bonus = dict(sorted(down_bonus.items()))
 
-            print(up_bonus, down_bonus)
+            # print(up_bonus, down_bonus)
             return up_bonus, down_bonus
         else:
             # Sẽ ưu tiên duyệt các điểm bên dưới + các điểm gần đường chéo bên trên
@@ -403,7 +404,7 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
             up_bonus = bonus_other     
             up_bonus = dict(sorted(up_bonus.items()))
             down_bonus = dict(sorted(down_bonus.items()))
-            print(up_bonus, down_bonus)
+            # print(up_bonus, down_bonus)
             return down_bonus, up_bonus
             
     def heuristic_1(neighbor, end):
@@ -463,7 +464,7 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
             f_prev, (r, c) = open.get()
 
             if (r, c) == pos_end :
-                print(num_bonus)
+                # print(num_bonus)
                 if isCheckOther:
                     isCheckOther = False
                     # Tới khi đến được 1 nút thuộc bonus ưu tiên thì tìm 1 điểm bên kia có thể đi được
@@ -533,9 +534,9 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
                 parent = parents[child]
 
                     
-            print(g[end.get_pos()[0]][end.get_pos()[1]])
+            # print(g[end.get_pos()[0]][end.get_pos()[1]])
 
-            print("End path")
+            # print("End path")
             return reconstruct_path(way, grid, draw, clock)
         
         if not grid[x_cur][y_cur].is_start():
@@ -556,9 +557,10 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
         
         clock.tick(FPS)
         draw()
-        return [],0
 
-def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock):
+    return [],0
+
+def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock):
     WAYS_TOTAL = []
 
     def check_points_in_area(top, down, point, approxi):
@@ -755,7 +757,7 @@ def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock
                         f_n = g_n + h_n
                         opens.put((f_n, new_pos))
 
-                        grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+                        # grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
                         parents[new_pos] = cur_pos
                 
                 clock.tick(FPS)
@@ -864,7 +866,7 @@ def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock
                         opens.put((f_n, new_pos))
 
                         parents[new_pos] = cur_pos
-                        grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+                        # grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
                 
                 clock.tick(FPS)
                 draw()
@@ -926,12 +928,12 @@ def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock
                 opens.put((f_n, new_pos))
 
                 parents[new_pos] = cur_pos
-                grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
+                # grid[new_pos[0]][new_pos[1]].parents.append(cur_pos)
         
         clock.tick(FPS)
         draw()
 
-def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_list, start, end, clock):
+def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start, end, clock):
     def h_x(point):
         if pickup_list:  # ignore end while this are pick up point
             return point.min_distance

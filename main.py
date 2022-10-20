@@ -1,18 +1,13 @@
-from contextlib import nullcontext
-from copy import copy
-from pickle import TRUE
-from queue import PriorityQueue
-import pygame, sys, os
+import pygame
 import pygame.camera
 from pygame.locals import *
-import math
-import random
-from handle_file_maze import *
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_pickup_astar, algorithm_bonus_astar_2, algorithm_bonus_pickup_astar_2
+
 from init import *
-from handle_visualize import make_image, Video
-from handle_maze import *
 import utility as util
+from handle_file_maze import *
+from handle_maze import *
+from handle_visualize import make_image, Video
+from algorithm import *
 
 # Build all need to visualization
 """
@@ -83,21 +78,21 @@ def run():
                         is_alg_do = True
                 elif level == "level_2":
                     if(alg == "algo2"):
-                        way, cost = algorithm_bonus_astar_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
+                        way, cost = algorithm_handle_bonus(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
                         is_alg_do = True
                     if(alg == "algo1"):
-                        way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
+                        way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 elif level == "level_3":
                     if(alg == "algo2"):
-                        way, cost = algorithm_bonus_pickup_astar_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
+                        way, cost = algorithm_handle_bonus_pickup(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
                         is_alg_do = True
                     if(alg == "algo1"):
-                        way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
+                        way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 elif level == "advance":
                     if(alg == "algo1"):
-                        way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
+                        way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):
                     dir_output = level + "\\" + file.split(".")[0] + "\\" + alg
