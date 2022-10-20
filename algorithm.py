@@ -535,8 +535,8 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
                     
             print(g[end.get_pos()[0]][end.get_pos()[1]])
 
-            reconstruct_path(way, grid, draw, clock)
-            return True
+            
+            return reconstruct_path(way, grid, draw, clock)
         
         if not grid[x_cur][y_cur].is_start():
             grid[x_cur][y_cur].make_open()
@@ -556,6 +556,7 @@ def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
         
         clock.tick(FPS)
         draw()
+        return [],0
 
 def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock):
     WAYS_TOTAL = []
@@ -902,12 +903,12 @@ def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock
                     
             # print(WAYS_TOTAL)
             WAYS_TOTAL.reverse()
-            reconstruct_path(WAYS_TOTAL, grid, draw, clock)
-            print(g[end_pos[0]][end_pos[1]])
+            
+            #print(g[end_pos[0]][end_pos[1]])
 
 
 
-            return True
+            return reconstruct_path(WAYS_TOTAL, grid, draw, clock)
         
         if cur_pos != start_pos and cur_pos != end_pos:
             grid[cur_pos[0]][cur_pos[1]].make_open()
