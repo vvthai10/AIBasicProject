@@ -28,7 +28,6 @@ class Node:
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
-        self.parents = []
 
 
     def change_alpha(self):
