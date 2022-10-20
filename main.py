@@ -81,13 +81,16 @@ def run():
                         way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                 elif level == "level_2":
-                    # if(alg == "algo1"):
-                    #     way, cost = algorithm_bonus_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
-                    #     is_alg_do = True
+                    if(alg == "algo2"):
+                        way, cost = algorithm_bonus_astar_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, start, end, clock)
+                        is_alg_do = True
                     if(alg == "algo1"):
                         way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 elif level == "level_3":
+                    if(alg == "algo2"):
+                        way, cost = algorithm_bonus_pickup_astar_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, start, end, clock)
+                        is_alg_do = True
                     if(alg == "algo1"):
                         way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
