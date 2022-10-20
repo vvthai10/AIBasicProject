@@ -60,6 +60,9 @@ class Node:
 
     def reset(self):
         self.color = WHITE
+    
+    def reset_distance(self):
+        self.min_distance = -1
 
     def make_start(self):
         self.color = ORANGE
@@ -196,3 +199,15 @@ def merge_pickups_grid(pickup_points, grid):
 
     return pickups_queue
 #lưu đường đi ra khỏi mê cung thành file .png
+
+def merge_portal_grid(portal_list, grid):    
+    portal_queue = PriorityQueue()
+    nums = 0    
+    for point_pos in portal_list:
+        portal_queue.put(((point_pos[0], point_pos[1])))      
+        destination = portal_list[point_pos]
+        nums = nums + 1
+        grid[point_pos[0]][point_pos[1]].make_portal(nums, destination)
+        grid[destination[0]][destination[1]].make_portal(nums, point_pos)
+
+    return portal_queue

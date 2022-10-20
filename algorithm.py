@@ -1,7 +1,10 @@
-from queue import PriorityQueue
+from queue import PriorityQueue, Queue
+from http.client import FOUND
 import math
 import pygame
 from init import *
+import utility as util
+from dis import dis
 
 def reconstruct_path(way, grid, draw, clock):
     way.reverse()
@@ -323,7 +326,7 @@ def algorithm_astar(draw, grid, start, end, clock):
         draw()
     return [], 0
 
-def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
+def algorithm_bonus_astar_2(draw, grid, bonus, start, end, clock):
 
     def check_with_line(point, start, end):
         a = (end[1] - start[1]) / (end[0] - start[0])
@@ -554,7 +557,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
         clock.tick(FPS)
         draw()
 
-def algorithm_bonus_pickup_astar(draw, grid, bonus, pickups, start, end, clock):
+def algorithm_bonus_pickup_astar_2(draw, grid, bonus, pickups, start, end, clock):
     WAYS_TOTAL = []
 
     def check_points_in_area(top, down, point, approxi):
@@ -901,6 +904,9 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus, pickups, start, end, clock):
             WAYS_TOTAL.reverse()
             reconstruct_path(WAYS_TOTAL, grid, draw, clock)
             print(g[end_pos[0]][end_pos[1]])
+
+
+
             return True
         
         if cur_pos != start_pos and cur_pos != end_pos:
@@ -923,3 +929,238 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus, pickups, start, end, clock):
         
         clock.tick(FPS)
         draw()
+
+def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_list, start, end, clock):
+    def h_x(point):
+        if pickup_list:  # ignore end while this are pick up point
+            return point.min_distance
+        else:
+            return util.distance(point, end)
+
+    def g_x(point):
+        if point.is_bonus():
+            return point.heat_value + point.bonus * 2.5  # prioritize near by bonus point
+        else:
+            return point.heat_value
+
+    def heuristic(target):
+        return h_x(target) + g_x(target)
+
+    def remove_pickup(grid, node, pickup_list, portal_list):
+        pickup_list.remove((node.y/util.SIZE, node.x/util.SIZE))
+        node.reset()
+        node.make_open()
+        util.update_distance_grid(grid, pickup_list, portal_list)
+
+    def remove_bonus(grid, node, bonus_list, portal_list):
+        bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
+        node.reset()
+        node.make_open()
+        util.update_bonus_grid(grid, bonus_list, portal_list)
+
+    def check_parent(leaf_node, node_to_check, parent_list, pos_root):
+        child = leaf_node.get_pos()
+        parent = parent_list.get(child)
+        if not parent:
+            return False
+        while parent != pos_root:
+            if parent == node_to_check.get_pos():
+                return True
+            child = parent
+            parent = parent_list[child]
+        return False
+
+
+    if len(portal_list):
+        portal_flag = True
+    else:
+        portal_flag = False
+    way = []
+    closed = []
+    open = PriorityQueue()   # contain nodes (f_n, node)
+    parents = {}             # contain positions
+    checkpoint_pos = start.get_pos()
+    open.put((heuristic(start), start))
+
+    while not open.empty():
+        value_heuristic, node = open.get()
+        pos = node.get_pos()
+        if pos == end.get_pos():  # reach the end
+            tmp_way = [pos]
+            child = node.get_pos()
+            parent = parents[child]
+            while parent != checkpoint_pos:
+                tmp_way.append(parent)
+                child = parent
+                parent = parents[child]
+            tmp_way.append(checkpoint_pos)
+            tmp_way.reverse()
+            way = way + tmp_way
+            
+            way.reverse()   #phục vụ cho việc vẽ ra file .png
+            return reconstruct_path(way, grid, draw, clock)
+        elif node != start:
+            node.make_open()
+
+        # check if reach bonus point
+        if util.check_bonus_list(node, bonus_list):
+            remove_bonus(grid, node, bonus_list, portal_list)
+
+            # find this part of the way
+            tmp_way = []
+            child = node.get_pos()
+            parent = parents.get(child)
+            if parent:  # if not run reverse
+                while parent != checkpoint_pos:
+                    tmp_way.append(parent)
+                    child = parent
+                    parent = parents[child]
+                tmp_way.append(checkpoint_pos)
+                tmp_way.reverse()
+
+            # add tmp_way to way
+            way = way + tmp_way
+            # update checkpoint
+            checkpoint_pos = node.get_pos()
+            # reset queues
+            parents.clear()
+            open = PriorityQueue()
+            closed = []
+            open.put((heuristic(node), node))
+
+        # check if reach bonus point
+        elif util.check_pickup_list(node, pickup_list):
+            remove_pickup(grid, node, pickup_list, portal_list)
+
+            # find this part of the way
+            tmp_way = []
+            child = node.get_pos()
+            parent = parents.get(child)
+            if parent:  # if not run reverse
+                while parent != checkpoint_pos:
+                    tmp_way.append(parent)
+                    child = parent
+                    parent = parents[child]
+                tmp_way.append(checkpoint_pos)
+                tmp_way.reverse()
+
+            # add tmp_way to way
+            way = way + tmp_way
+            # update checkpoint
+            checkpoint_pos = node.get_pos()
+            # reset queues
+            parents.clear()
+            open = PriorityQueue()
+            closed = []
+            open.put((heuristic(node), node))
+
+        # open new node
+        for neighbor in node.neighbors:
+            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor in closed:
+                neighbor_pos = neighbor.get_pos()
+                value = heuristic(neighbor)
+                if portal_flag and neighbor_pos in portal_list:                            
+                    destination_pos = portal_list[neighbor_pos]
+                    neighbor = grid[destination_pos[0]][destination_pos[1]]                                                            
+                    neighbor_pos = neighbor.get_pos()
+                open.put((value, neighbor))
+                parents[neighbor.get_pos()] = pos
+
+        closed.append(node)
+        clock.tick(FPS)
+        draw()
+    return [], 0
+
+def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
+    def h_x(point):
+        return util.distance(point, end)
+
+    def g_x(point, bonus_list=bonus_list):
+        if (point.is_bonus()
+                and (point.y/util.SIZE, point.x/util.SIZE, point.bonus) in bonus_list):
+            return point.heat_value + point.bonus * 10  # edit thiss
+        else:
+            return point.heat_value
+
+    def heuristic(target):
+        return h_x(target) + g_x(target)
+
+    def check_parent(leaf_node, node_to_check, parent_list, pos_root):
+        child = leaf_node.get_pos()
+        parent = parent_list.get(child)
+        if not parent:
+            return False
+        while parent != pos_root:
+            if parent == node_to_check.get_pos():
+                return True
+            child = parent
+            parent = parent_list[child]
+        return False
+
+    way = []
+    closed = []
+    open = PriorityQueue()   # contain nodes (f_n, node)
+    parents = {}             # contain positions
+    checkpoint_pos = start.get_pos()
+    open.put((heuristic(start), start))
+
+    while not open.empty():
+        value_heuristic, node = open.get()
+        pos = node.get_pos()
+        if pos == end.get_pos():  # reach the end
+            tmp_way = [pos]
+            child = node.get_pos()
+            parent = parents[child]
+            while parent != checkpoint_pos:
+                tmp_way.append(parent)
+                child = parent
+                parent = parents[child]
+            tmp_way.append(checkpoint_pos)
+            tmp_way.reverse()
+            way = way + tmp_way
+            
+            way.reverse()   #phục vụ cho việc vẽ ra file .png
+            return reconstruct_path(way, grid, draw, clock)
+        elif node != start:
+            node.make_open()
+
+        # check if reach bonus point
+        if node.bonus < 0:
+            # delete node from bonus queue
+            bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
+            # re-draw heat grid
+            util.update_bonus_grid(grid, bonus_list)
+
+            # find this part of the way
+            tmp_way = []
+            child = node.get_pos()
+            parent = parents.get(child)
+            if parent:  # if not run reverse
+                while parent != checkpoint_pos:
+                    tmp_way.append(parent)
+                    child = parent
+                    parent = parents[child]
+                tmp_way.append(checkpoint_pos)
+                tmp_way.reverse()
+
+            # add tmp_way to way
+            way = way + tmp_way
+            # update checkpoint
+            checkpoint_pos = node.get_pos()
+            # reset queues
+            parents.clear()
+            open = PriorityQueue()
+            closed = []
+            open.put((heuristic(node), node))
+
+        # open new node
+        for neighbor in node.neighbors:
+            if not check_parent(node, neighbor, parents, checkpoint_pos) and not neighbor in closed:
+                value = heuristic(neighbor)
+                open.put((value, neighbor))
+                parents[neighbor.get_pos()] = pos
+
+        closed.append(node)
+        clock.tick(FPS)
+        draw()
+    return [], 0
