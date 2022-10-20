@@ -8,7 +8,7 @@ from pygame.locals import *
 import math
 import random
 from handle_file_maze import *
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar, algorithm_bonus_pickup_astar
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_pickup_astar
 from init import *
 from handle_visualize import make_image, Video
 from handle_maze import *
@@ -31,7 +31,7 @@ def run():
     
     for level in levels:
         for file in files[level]:
-            maze, bonus_points, pickup_points = read_file_normal("./input/" + level + "/" + file)
+            maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
             
             ROWS = len(maze)
             COLS = len(maze[0])
@@ -54,15 +54,15 @@ def run():
                 start, end = merge_maze_grid(maze, grid,ROWS,COLS)
                 bonus_queue = merge_bonus_grid(bonus_points, grid)
                 pickup_queue = merge_pickups_grid(pickup_points,grid)
-                # portal_queue = merge_portal_grid(portal_points,grid)
-                # if(not level == "level_1"):
-                    # util.update_bonus_grid(grid, bonus_points, portal_points)
-                    # util.update_distance_grid(grid, pickup_points, portal_points)
+                portal_queue = merge_portal_grid(portal_points,grid)
+                if(not level == "level_1"):
+                    util.update_bonus_grid(grid, bonus_points, portal_points)
+                    util.update_distance_grid(grid, pickup_points, portal_points)
                 for row in grid:
                     for node in row:
                         node.update_neighbors(grid)            
                 
-                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
                 is_alg_do = False # kiem tra co thuat toan nao chay  khong
                 if level == "level_1":
                     if(alg == "dfs"):
@@ -81,18 +81,18 @@ def run():
                         way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                 elif level == "level_2":
+                    # if(alg == "algo1"):
+                    #     way, cost = algorithm_bonus_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
+                    #     is_alg_do = True
                     if(alg == "algo1"):
-                        way, cost = algorithm_bonus_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
-                        is_alg_do = True
-                    if(alg == "algo2"):
                         way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 elif level == "level_3":
-                    if(alg == "algo2"):
+                    if(alg == "algo1"):
                         way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 elif level == "advance":
-                    if(alg == "algo2"):
+                    if(alg == "algo1"):
                         way, cost = algorithm_bonus_pickup_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):
@@ -101,7 +101,7 @@ def run():
                     write_file(dir_output + "\\" + alg + ".txt", cost )
                     video.make_mp4(dir_output+ "\\" + alg)
                     video.destroy_png()
-                    maze, bonus_points, pickup_points, portal_points = read_file_advance("./input/" + level + "/" + file)
+                    maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
                     make_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
                 pygame.quit()
             

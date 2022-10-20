@@ -12,7 +12,7 @@ def reconstruct_path(way, grid, draw, clock):
     print("List bonus have: ")
     total = 0
     for current in way:
-        print(grid[current[0]][current[1]].bonus)
+        # print(grid[current[0]][current[1]].bonus)
         total += grid[current[0]][current[1]].bonus
         node = grid[current[0]][current[1]]
         node.make_path()
@@ -1071,6 +1071,7 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_lis
         draw()
     return [], 0
 
+'''
 def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
     def h_x(point):
         return util.distance(point, end)
@@ -1164,3 +1165,4 @@ def algorithm_bonus_astar(draw, grid, bonus_list, start, end, clock):
         clock.tick(FPS)
         draw()
     return [], 0
+'''

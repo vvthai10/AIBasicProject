@@ -10,12 +10,21 @@ Args:
     3. start, end: The starting and ending points,
     4. route: The route from the starting point to the ending one, defined by an array of (x, y), e.g. route = [(1, 2), (1, 3), (1, 4)]
 '''
-def make_image(matrix, bonus, start, end, route: list,saveDir = None):
-    # 1. Define walls and array of direction based on the route
+def make_image(matrix, bonus, pickup, portal, start, end, route: list,saveDir = None ):
+    """
+    Args:
+      1. matrix: The matrix read from the input file,
+      2. bonus: The array of bonus points,
+      3. start, end: The starting and ending points,
+      4. route: The route from the starting point to the ending one, defined by an array of (x, y), e.g. route = [(1, 2), (1, 3), (1, 4)]
+    """
+    #1. Define walls and array of direction based on the route
     route.reverse()
-    route.append(start.get_pos())
+    if(route[len(route)- 1] != start.get_pos()):
+        route.append(start.get_pos())
     route.reverse()
-    route.append(end.get_pos())
+    if(route[len(route)- 1] != end.get_pos()):
+        route.append(end.get_pos())
     walls=[(i,j) for i in range(len(matrix)) for j in range(len(matrix[0])) if matrix[i][j]=='x']
 
     if route:
@@ -32,7 +41,7 @@ def make_image(matrix, bonus, start, end, route: list,saveDir = None):
 
         direction.pop(0)
 
-    # 2. Drawing the map
+    #2. Drawing the map
     ax=plt.figure(dpi=100).add_subplot(111)
 
     for i in ['top','bottom','right','left']:
@@ -40,10 +49,17 @@ def make_image(matrix, bonus, start, end, route: list,saveDir = None):
 
     plt.scatter([i[1] for i in walls],[-i[0] for i in walls],
                 marker='X',s=100,color='black')
-    if(not bonus.empty()):
+    if(bonus):
         plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
                     marker='P',s=100,color='green')
 
+    if(pickup):
+        plt.scatter([i[1] for i in pickup],[-i[0] for i in pickup],
+                    marker='D',s=100,color='blue')
+
+    if(portal):
+        plt.scatter([i[1] for i in portal],[-i[0] for i in portal],
+                    marker='H',s=100,color='pink')
     plt.scatter(start.col,-start.row,marker='*',
                 s=100,color='gold')
 
@@ -59,6 +75,7 @@ def make_image(matrix, bonus, start, end, route: list,saveDir = None):
     plt.yticks([])
     plt.savefig(saveDir + ".png")
     
+
 class Video:
  
     def __init__(self,size):

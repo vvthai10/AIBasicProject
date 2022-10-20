@@ -90,6 +90,11 @@ class Node:
     def make_pickups(self):
         self.color = BLUE
     
+    def make_portal(self, nums, des):
+        self.color = GREY
+        self.portal_num = nums
+        self.destination = des
+    
     def make_path(self):
         if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
             self.color = PURPLE

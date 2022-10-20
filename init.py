@@ -4,7 +4,7 @@ WIDTH = 800
 HEIGHT = 600
 SIZE = 32
 
-FPS = 10
+FPS = 90
 
 RED = (255, 0, 0)
 GREEN = (144, 229, 150)
