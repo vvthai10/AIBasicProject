@@ -1,0 +1,18 @@
+2
+2 16 -18
+9 2 -38
+xxxxxxxxxxxxxxxxxxxx
+xx     x     x     x
+x     S    xx   +  x
+x  x  x      x     x
+x  X         x     x
+x  x             x x
+x       x          x
+x        x x x  x  x
+xx       x         x
+x +  x  x x     x  x
+x x         x    x x
+x          x       x
+x      x        x  x
+x          x       x
+xxxxxxxxxxxx xxxxxxx
