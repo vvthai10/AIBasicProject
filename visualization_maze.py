@@ -365,15 +365,15 @@ def visualize_maze_by_image(matrix, bonus, pickup, portal, start, end, route: li
 
     plt.scatter([i[1] for i in walls],[-i[0] for i in walls],
                 marker='X',s=100,color='black')
-    if(not bonus):
+    if(bonus):
         plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
                     marker='P',s=100,color='green')
 
-    if(not pickup):
+    if(pickup):
         plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
                     marker='D',s=100,color='blue')
 
-    if(not portal):
+    if(portal):
         plt.scatter([i[1] for i in bonus],[-i[0] for i in bonus],
                     marker='H',s=100,color='pink')
     plt.scatter(start.col,-start.row,marker='*',
