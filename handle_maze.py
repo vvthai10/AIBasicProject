@@ -1,4 +1,7 @@
+import pygame
+from init import *
 from contextlib import nullcontext
+from copy import copy
 from pickle import TRUE
 from queue import PriorityQueue
 import pygame, sys, os
@@ -6,36 +9,11 @@ import pygame.camera
 from pygame.locals import *
 import math
 import random
-from handle_file_maze import read_file
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar, algorithm_bonus_astar, algorithm_bonus_pickup_astar
-from make_video import Video
+from handle_file_maze import *
+from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar
+from init import *
+from handle_visualize import make_image, Video
 
-WIDTH = 800
-HEIGHT = 600
-FPS = 10
-
-RED = (255, 0, 0)
-GREEN = (144, 229, 150)
-BLUE = (51, 143, 165)
-YELLOW = (255, 255, 0)
-WHITE = (255, 255, 255)
-BLACK = (56, 55, 56)
-PURPLE = (175, 117, 173)
-ORANGE = (234, 194 ,84)
-GREY = (126,126,121)
-TURQUOISE = (47, 66, 206)
-
-# Build all need to visualization
-"""
-Description: Node is cell in matrix, it has another state with different color:
-- White: Can go
-- Black: Wall
-- Orange: Start
-- Turquoise: End
-- Green: Process find way
-- Purple: Correct way
-- Yellow: Bonus point
-"""
 class Node:
     def __init__(self, row, col, size, total_rows, total_cols):
         self.costs = {}   #cost from this node to near node
@@ -51,6 +29,7 @@ class Node:
         self.total_cols = total_cols
         self.alpha = 255
         self.parents = []
+
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -82,6 +61,9 @@ class Node:
 
     def reset(self):
         self.color = WHITE
+    
+    def reset_distance(self):
+        self.min_distance = -1
 
     def make_start(self):
         self.color = ORANGE
@@ -109,12 +91,28 @@ class Node:
     def make_pickups(self):
         self.color = BLUE
     
+    def make_portal(self, nums, des):
+        self.color = GREY
+        self.portal_num = nums
+        self.destination = des
+    
     def make_path(self):
         if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
             self.color = PURPLE
             self.alpha = 255
         else:
             self.alpha = 120
+
+    def draw_portal(self, screen):
+        self.change_alpha()
+        s = pygame.Surface((self.size, self.size))  # the size of your rect
+        s.set_alpha(self.alpha)                # alpha level
+        s.fill(self.color)           # this fills the entire surface
+        screen.blit(s, (self.x, self.y))
+        # if not wall
+        if not self.is_wall() and self.is_portal():
+            screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
+                        (self.x + self.size/8, self.y + self.size/4))
 
     def draw(self, screen):
         self.change_alpha()
@@ -162,7 +160,7 @@ def draw_grid(screen, rows, cols, width, height):
         for j in range(cols):
             pygame.draw.line(screen, GREY, (j * SIZE, 0), (j * SIZE, height))
 
-def draw(screen, grid, rows, cols, width, height):
+def draw(screen, grid, rows, cols, width, height, video):
     screen.fill(WHITE)
     
     for row in grid:
@@ -174,7 +172,7 @@ def draw(screen, grid, rows, cols, width, height):
 
     pygame.display.update()
 
-def merge_maze_grid(maze, grid):
+def merge_maze_grid(maze, grid, ROWS,COLS):
 
     start = None
     end = None
@@ -217,76 +215,16 @@ def merge_pickups_grid(pickup_points, grid):
         grid[point[0]][point[1]].bonus = 0
 
     return pickups_queue
+#lưu đường đi ra khỏi mê cung thành file .png
 
-def main(screen, maze, bonus_points, pickup_points, width, height):
-    grid = make_grid(ROWS, COLS)
+def merge_portal_grid(portal_list, grid):    
+    portal_queue = PriorityQueue()
+    nums = 0    
+    for point_pos in portal_list:
+        portal_queue.put(((point_pos[0], point_pos[1])))      
+        destination = portal_list[point_pos]
+        nums = nums + 1
+        grid[point_pos[0]][point_pos[1]].make_portal(nums, destination)
+        grid[destination[0]][destination[1]].make_portal(nums, point_pos)
 
-    start = None
-    end = None
-
-    start, end = merge_maze_grid(maze, grid)
-    bonus_queue = merge_bonus_grid(bonus_points, grid)
-    pickups_queue = merge_pickups_grid(pickup_points, grid)
-
-    run = True
-    while run:
-        draw(screen, grid, ROWS, COLS, width, height)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-
-# NOTE: Phần này dùng để khi nhấn phím cách thì thuật toán mới chạy được
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and start and end:
-                    for row in grid:
-                        for node in row:
-                            node.update_neighbors(grid)
-                    
-                    # check = algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # check = algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # check = algorithm_ucs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # check = algorithm_greedy_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    # check = algorithm_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-                    check = algorithm_bonus_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, start, end, clock)
-                    # check = algorithm_bonus_pickup_astar(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, bonus_queue, pickups_queue, start, end, clock)
-                    print(check)
-
-                
-# NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        # for row in grid:
-        #     for node in row:
-        #         node.update_neighbors(grid)
-        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # run = False
-
-    
-    
-    pygame.quit()
-
-    
-"""
-Start simulation
-"""
-
-maze, bonus_points, pickup_points = read_file("./maze/maze_6.txt")
-
-ROWS = len(maze)
-COLS = len(maze[0])
-
-SIZE = 32
-
-WIDTH = COLS * SIZE
-HEIGHT = ROWS * SIZE
-
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-video = Video((WIDTH, HEIGHT))
-pygame.display.set_caption("Simulation of finding the way")
-clock = pygame.time.Clock()
-
-video.destroy_png()
-main(SCREEN, maze, bonus_points, pickup_points, WIDTH, HEIGHT)
-
-# Build video from image.
-video.make_mp4("maze_6")
-video.destroy_png()
+    return portal_queue
