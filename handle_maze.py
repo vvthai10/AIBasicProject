@@ -80,7 +80,7 @@ class Node:
         self.color = ORANGE
 
     def make_open(self):
-        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE and self.color != GREY:
             self.color = GREEN
             self.alpha = 255
         else:
@@ -132,7 +132,7 @@ class Node:
         screen.blit(s, (self.x, self.y))
         # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
         if not self.is_wall() and self.portal_num != -1:
-            screen.blit(self.normal_font.render(str(int(self.portal_num)), True, RED),
+            screen.blit(self.normal_font.render(str(int(self.portal_num)), True, WHITE),
                         (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
