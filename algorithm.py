@@ -842,14 +842,13 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
         return h_x(target) + g_x(target)
 
     def remove_pickup(grid, node, pickup_list, portal_list):
-        pickup_list.remove((node.y/util.SIZE, node.x/util.SIZE))
-        node.reset()
+        pickup_list.remove((node.y/util.SIZE, node.x/util.SIZE))        
         node.make_open()
         util.update_distance_grid(grid, pickup_list, portal_list)
 
     def remove_bonus(grid, node, bonus_list, portal_list):
-        bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))
-        node.reset()
+        bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))        
+        node.bonus = 0
         node.make_open()
         util.update_bonus_grid(grid, bonus_list, portal_list)
 
