@@ -103,6 +103,7 @@ def run():
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):
+                    print("đã chạy xong thuật toán", alg, "với bản đồ", file, " thuộc folder", level )
                     dir_output = ""
                     if(alg.split("_")[0] == "gbfs" or alg.split("_")[0] == "astar"):
                         dir_output = level + "\\" + file.split(".")[0] + "\\" + alg.split("_")[0]
