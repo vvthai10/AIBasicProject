@@ -1,4 +1,4 @@
-12
+12 0 0
 9 29 -23
 3 23 -46
 20 20 -3
@@ -17,7 +17,7 @@ x           x x  x        x x x   x
 x    x     x    x    x +        x x
 x       x x       x       x       x
 x   x   +                          
-x                              x  x
+x         S                    x  x
 x                +      x         x
 x x  x                            x
 x      x    x        x      x+  x x
@@ -29,7 +29,7 @@ x   x       x                x    x
 x x        x     +    x x         x
 x            x  x   x             x
 x        x     +  x        x      x
-xx  S           x        x     x xx
+xx              x        x     x xx
 x      x  x         x             x
 x                 x +         x   x
 x  x          x +   x  x     x    x

@@ -1,5 +1,6 @@
 from pickle import TRUE
 from queue import PriorityQueue, Queue
+from turtle import color
 import pygame
 import sys
 import pygame.camera
@@ -61,7 +62,7 @@ class Node:
         self.min_distance = -1  # always positive
         # portal related
         self.destination = self
-        self.portal_num = -1 # always >= 0
+        self.portal_num = -1  # always >= 0
 
     def change_alpha(self):
         if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
@@ -91,7 +92,7 @@ class Node:
 
     def is_pickups(self):
         return self.color == BLUE
-    
+
     def is_portal(self):
         return self.color == GREY
 
@@ -105,7 +106,7 @@ class Node:
         self.color = ORANGE
 
     def make_open(self):
-        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
+        if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE and self.color != GREY:
             self.color = GREEN
             self.alpha = 255
         else:
@@ -125,15 +126,16 @@ class Node:
 
     def make_pickups(self):
         self.color = BLUE
-        
+
     def make_portal(self, nums, des):
         self.color = GREY
         self.portal_num = nums
         self.destination = des
 
     def make_path(self):
-        self.color = PURPLE
-        self.alpha = 255
+        if self.color != GREY:
+            self.color = PURPLE
+            self.alpha = 255
 
     def draw(self, screen):
         self.change_alpha()
@@ -141,9 +143,13 @@ class Node:
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
-        if not self.is_wall() and self.is_portal():
-            screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
-                        (self.x + self.size/8, self.y + self.size/4))
+        if not self.is_wall():
+            if self.is_bonus():
+                screen.blit(self.bold_font.render(str(round(self.bonus, 2)), True, (0, 0, 0)),
+                            (self.x + self.size/4, self.y + self.size/4))
+            elif self.is_portal():
+                screen.blit(self.bold_font.render(str(int(self.portal_num/2)), True, WHITE),
+                            (self.x + self.size/2.5, self.y + self.size/3))
 
     def draw_heatmap(self, screen):
         self.change_alpha()
@@ -181,7 +187,7 @@ class Node:
         if not self.is_wall() and self.is_portal():
             screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
                         (self.x + self.size/8, self.y + self.size/4))
-            
+
     def draw_all_map(self, screen):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
@@ -277,17 +283,19 @@ def merge_maze_grid(maze, grid):
 
     return start, end
 
-def merge_portal_grid(portal_list, grid):    
+
+def merge_portal_grid(portal_list, grid):
     portal_queue = PriorityQueue()
-    nums = 0    
+    nums = 0
     for point_pos in portal_list:
-        portal_queue.put(((point_pos[0], point_pos[1])))      
+        portal_queue.put(((point_pos[0], point_pos[1])))
         destination = portal_list[point_pos]
         nums = nums + 1
         grid[point_pos[0]][point_pos[1]].make_portal(nums, destination)
         grid[destination[0]][destination[1]].make_portal(nums, point_pos)
 
     return portal_queue
+
 
 def merge_bonus_grid(bonus_points, grid):
     # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
@@ -318,7 +326,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
     grid = make_grid(ROWS, COLS)
 
     start = None
-    end = None    
+    end = None
     start, end = merge_maze_grid(maze, grid)
     merge_bonus_grid(bonus_points=bonus_points, grid=grid)
     merge_pickups_grid(pickup_points, grid)
@@ -345,7 +353,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
                             node.update_neighbors(grid)
 
                     algo.algorithm_bonus_pickup_astar(lambda: draw(
-                        screen, grid, ROWS, COLS, width, height, addtional_map), grid, bonus_points, pickup_points,portal_list, start, end, clock)
+                        screen, grid, ROWS, COLS, width, height, addtional_map), grid, bonus_points, pickup_points, portal_list, start, end, clock)
                 # if event.key == pygame.K_SPACE and start and end:
                 #      run = False
 
@@ -364,7 +372,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
 """
 Start simulation
 """
-maze_name = '6'
+maze_name = '11'
 maze, bonus_points, pickup_points, portal_list = read_file(
     "./maze/maze_" + maze_name + ".txt")
 
@@ -385,5 +393,5 @@ video.destroy_png()
 main(SCREEN, maze, bonus_points, pickup_points, portal_list, WIDTH, HEIGHT)
 
 # Build video from image.
-video.make_mp4("maze_" + maze_name + "_heat")
+video.make_mp4("maze_" + maze_name)
 video.destroy_png()
