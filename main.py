@@ -230,26 +230,7 @@ if __name__ == "__main__":
     pygame.display.set_caption("Simulation of finding the way")
     video = Video((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
-    #run()
-    maze, bonus_points, pickup_points, portal_points = read_file("./input/level_1/input1.txt")
-    
-    ROWS = len(maze)
-    COLS = len(maze[0])
-    WIDTH = COLS * SIZE
-    HEIGHT = ROWS * SIZE
-    way = []
-    cost = 0
-    start = None
-    end = None
-    grid = make_grid(ROWS, COLS)
-    start, end = merge_maze_grid(maze, grid,ROWS,COLS)
-    for row in grid:
-        for node in row:
-            node.update_neighbors(grid)    
-    SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-    draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video)
-    way, cost = algorithm_astar_heuristic_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
-    video.make_mp4("temp")
-    video.destroy_png()                    
+    run()
+
     
     
