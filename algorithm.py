@@ -661,7 +661,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
             clock.tick(FPS)
             draw()
-        return [], 0
+        
 
     open = PriorityQueue()
     open.put(( g[pos_start[0]][pos_start[1]] + heuristic_1(pos_start, end.get_pos()), (pos_start)))
