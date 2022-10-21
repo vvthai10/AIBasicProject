@@ -38,7 +38,7 @@ def run():
             end = None
 
             algs = []
-            no_bonus_alg = ["dfs","bfs","ucs","gbfs_heuristic_1","gbfs_heuristic_2","astar_heuristic_1","astar_heuristic_1"]
+            no_bonus_alg = ["dfs","bfs","ucs","gbfs_heuristic_1","gbfs_heuristic_2","astar_heuristic_1","astar_heuristic_2"]
             bonus_alg = ["algo1", "algo2"]
             if(level == "level_1"):
                 algs = no_bonus_alg
