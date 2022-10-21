@@ -10,7 +10,7 @@ from pygame.locals import *
 import math
 import random
 from handle_file_maze import *
-from algorithm import algorithm_dfs, algorithm_bfs, algorithm_ucs, algorithm_greedy_bfs, algorithm_astar
+
 from init import *
 from handle_visualize import make_image, Video
 

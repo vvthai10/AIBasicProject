@@ -38,7 +38,7 @@ def run():
             end = None
 
             algs = []
-            no_bonus_alg = ["dfs","bfs","ucs","gbfs","astar"]
+            no_bonus_alg = ["dfs","bfs","ucs","gbfs_heuristic_1","gbfs_heuristic_2","astar_heuristic_1","astar_heuristic_2"]
             bonus_alg = ["algo1", "algo2"]
             if(level == "level_1"):
                 algs = no_bonus_alg
@@ -70,12 +70,19 @@ def run():
                     elif(alg == "ucs"):
                         way, cost = algorithm_ucs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
-                    elif(alg == "gbfs"):
-                        way, cost =algorithm_greedy_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
+                    elif(alg == "gbfs_heuristic_1"):
+                        way, cost =algorithm_greedy_bfs_heuristic_1(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
+                        is_alg_do = True
+                    elif(alg == "gbfs_heuristic_2"):
+                        way, cost =algorithm_greedy_bfs_heuristic_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
+                        is_alg_do = True
+                    
+                    elif(alg == "astar_heuristic_1"):
+                        way, cost = algorithm_astar_heuristic_1(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                     else:
-                        way, cost = algorithm_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
-                        is_alg_do = True
+                        way, cost = algorithm_astar_heuristic_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
+                        is_alg_do = True                        
                 elif level == "level_2":
                     if(alg == "algo1"):
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
@@ -95,7 +102,11 @@ def run():
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):
-                    dir_output = level + "\\" + file.split(".")[0] + "\\" + alg
+                    dir_output = ""
+                    if(alg.split("_")[0] == "gbfs" or alg.split("_")[0] == "astar"):
+                        dir_output = level + "\\" + file.split(".")[0] + "\\" + alg.split("_")[0]
+                    else:
+                        dir_output = level + "\\" + file.split(".")[0] + "\\" + alg
                     create_folder(dir_output)               
                     write_file(dir_output + "\\" + alg + ".txt", cost )
                     video.make_mp4(dir_output+ "\\" + alg)
