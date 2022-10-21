@@ -73,7 +73,7 @@ def make_image(matrix, bonus, pickup, portal, start, end, route: list,saveDir = 
          verticalalignment='center')
     plt.xticks([])
     plt.yticks([])
-    plt.savefig(saveDir + ".png")
+    plt.savefig(saveDir + ".jpg")
     
 
 class Video:
