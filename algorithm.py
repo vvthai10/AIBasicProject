@@ -1309,12 +1309,14 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
 
     def remove_pickup(grid, node, pickup_list, portal_list):
         pickup_list.remove((node.y/util.SIZE, node.x/util.SIZE))        
+        node.reset()
         node.make_open()
         util.update_distance_grid(grid, pickup_list, portal_list)
 
     def remove_bonus(grid, node, bonus_list, portal_list):
         bonus_list.remove((node.y/util.SIZE, node.x/util.SIZE, node.bonus))        
-        node.bonus = 0
+        # node.bonus = 0
+        node.reset()
         node.make_open()
         util.update_bonus_grid(grid, bonus_list, portal_list)
 
