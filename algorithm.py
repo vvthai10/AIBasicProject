@@ -14,12 +14,12 @@ def reconstruct_path(way, grid, draw, clock):
     total = 0
     for current in way:
         # print(grid[current[0]][current[1]].bonus)
-        total += grid[current[0]][current[1]].bonus
+        # total += grid[current[0]][current[1]].bonus
         node = grid[current[0]][current[1]]
         node.make_path()
         #chi phí của đường đi xuat ra file ở đây các node.bonus = 0
         #sưa lại bên chỗ cài đặt node
-        cost = cost  + node.bonus
+        cost = cost  + node.get_bonus()
         clock.tick(FPS)
         draw()
     print ("Chi phi duong di la: ", cost)
@@ -759,6 +759,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
 
         while not pickups.empty():
             (r_cur, c_cur) = pickups.get()
+            # print(f"Pick up: {(r_cur, c_cur)}")
             if check_points_in_area(start_pos, (r_bottom, c_bottom), (r_cur, c_cur), 0):
                 pickups_1.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
@@ -770,6 +771,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
 
         while not bonus.empty():
             value, (r_cur, c_cur) = bonus.get()
+            # print(f"Bonus: {(r_cur, c_cur)}")
             if check_points_in_area(start_pos, (r_bottom, c_bottom), (r_cur, c_cur), 0):
                 bonus_1.put((value, (r_cur, c_cur)))
             elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
@@ -835,8 +837,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 bonus.put((v, (r, c)))  
 
             opens = PriorityQueue()
-            # g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
-            g[start_cur_pos[0]][start_cur_pos[1]] = 1
+            g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            # g[start_cur_pos[0]][start_cur_pos[1]] = 1
             g_n = g[start_cur_pos[0]][start_cur_pos[1]]
             h_n = heuristic_1(start_cur_pos, end_cur_pos)
             f_n = g_n + h_n
@@ -898,8 +900,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     if not new_pos in closed:
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
-                        # g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
-                        g_n =  g[cur_pos[0]][cur_pos[1]] + 1
+                        g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        # g_n =  g[cur_pos[0]][cur_pos[1]] + 1
                         g[new_pos[0]][new_pos[1]] = g_n
                         h_n = heuristic_1(new_pos, end_cur_pos) 
                         f_n = g_n + h_n
@@ -970,8 +972,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         if len_1 <= len_2:
             end_cur_pos = bonus_pos
             opens = PriorityQueue()
-            # g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
-            g[start_cur_pos[0]][start_cur_pos[1]] = 1
+            g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            # g[start_cur_pos[0]][start_cur_pos[1]] = 1
             g_n = g[start_cur_pos[0]][start_cur_pos[1]]
             h_n = heuristic_1(start_cur_pos, end_cur_pos)
             f_n = g_n + h_n
@@ -1008,8 +1010,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     if not new_pos in closed:
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
-                        # g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
-                        g_n = g[cur_pos[0]][cur_pos[1]] + 1
+                        g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        # g_n = g[cur_pos[0]][cur_pos[1]] + 1
                         g[new_pos[0]][new_pos[1]] = g_n
                         h_n = heuristic_1(new_pos, end_cur_pos) 
                         f_n = g_n + h_n
@@ -1024,7 +1026,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
     # Từ điểm hiện tại đến cuối đường
     end_cur_pos = end_pos
     opens = PriorityQueue()
-    g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+    # g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
     g_n = g[start_cur_pos[0]][start_cur_pos[1]]
     h_n = heuristic_1(start_cur_pos, end_cur_pos)
     f_n = g_n + h_n
@@ -1071,8 +1073,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
             if not new_pos in closed:
                 # print(f"\tAdd neighbor {new_pos}")
                 # NOTE: g[r][c].get_bonus()
-                # g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
-                g_n = g[cur_pos[0]][cur_pos[1]] + 1
+                g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                # g_n = g[cur_pos[0]][cur_pos[1]] + 1
                 g[new_pos[0]][new_pos[1]] = g_n
                 h_n = heuristic_1(new_pos, end_cur_pos) 
                 f_n = g_n + h_n

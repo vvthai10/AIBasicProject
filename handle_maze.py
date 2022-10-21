@@ -25,6 +25,7 @@ class Node:
         self.neighbors = []
         self.size = size
         self.bonus = 1
+        self.getBonus = False
         self.total_rows = total_rows
         self.total_cols = total_cols
         self.alpha = 255
@@ -35,6 +36,14 @@ class Node:
             self.alpha = self.alpha - 20
     def get_pos(self):
         return self.row, self.col
+
+    def get_bonus(self):
+        if self.bonus < 0:
+            temp = self.bonus
+            self.bonus = 1
+            return temp
+        
+        return self.bonus
 
     # It use in A* ~ I don't sure.
     def is_closed(self):
