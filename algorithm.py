@@ -538,13 +538,18 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
 
         return pickups_1, pickups_2, pickups_3, pickups_4, bonus_1, bonus_2, bonus_3, bonus_4 
 
-    def clean_path_parents_is_used():
-        parents = []
+    def clean_path_parents_is_used(parents, closed):
+        parents = {}
         for point in closed:
             if grid[point[0]][point[1]].is_open() :
                 closed.remove(point)
 
+        return parents, closed
+
     def handle_pickups(pickups, bonus, start_cur_pos, end_cur_pos ):
+        closed = []
+        parents = {}
+
         while not pickups.empty():
             space, (end_cur_pos) = pickups.get()
             
@@ -603,7 +608,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     ways.append(start_cur_pos)
                     ways.reverse()
                     WAYS_TOTAL.extend(ways)
-                    clean_path_parents_is_used()
+                    parents, closed = clean_path_parents_is_used(parents, closed)
                     start_cur_pos = end_cur_pos
                     break
                 
@@ -738,7 +743,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     ways.append(start_cur_pos)
                     ways.reverse()
                     WAYS_TOTAL.extend(ways)
-                    clean_path_parents_is_used()
+                    parents, closed = clean_path_parents_is_used(parents, closed)
                     start_cur_pos = end_cur_pos
                     break
                 
