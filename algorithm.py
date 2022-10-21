@@ -455,7 +455,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 bonus.put((v, (r, c)))  
 
             opens = PriorityQueue()
-            g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            # g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            g[start_cur_pos[0]][start_cur_pos[1]] = 1
             g_n = g[start_cur_pos[0]][start_cur_pos[1]]
             h_n = heuristic_1(start_cur_pos, end_cur_pos)
             f_n = g_n + h_n
@@ -517,7 +518,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     if not new_pos in closed:
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
-                        g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        # g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        g_n =  g[cur_pos[0]][cur_pos[1]] + 1
                         g[new_pos[0]][new_pos[1]] = g_n
                         h_n = heuristic_1(new_pos, end_cur_pos) 
                         f_n = g_n + h_n
@@ -588,7 +590,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         if len_1 <= len_2:
             end_cur_pos = bonus_pos
             opens = PriorityQueue()
-            g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            # g[start_cur_pos[0]][start_cur_pos[1]] = grid[start_cur_pos[0]][start_cur_pos[1]].bonus
+            g[start_cur_pos[0]][start_cur_pos[1]] = 1
             g_n = g[start_cur_pos[0]][start_cur_pos[1]]
             h_n = heuristic_1(start_cur_pos, end_cur_pos)
             f_n = g_n + h_n
@@ -625,7 +628,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     if not new_pos in closed:
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
-                        g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        # g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                        g_n = g[cur_pos[0]][cur_pos[1]] + 1
                         g[new_pos[0]][new_pos[1]] = g_n
                         h_n = heuristic_1(new_pos, end_cur_pos) 
                         f_n = g_n + h_n
@@ -687,7 +691,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
             if not new_pos in closed:
                 # print(f"\tAdd neighbor {new_pos}")
                 # NOTE: g[r][c].get_bonus()
-                g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                # g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
+                g_n = g[cur_pos[0]][cur_pos[1]] + 1
                 g[new_pos[0]][new_pos[1]] = g_n
                 h_n = heuristic_1(new_pos, end_cur_pos) 
                 f_n = g_n + h_n
