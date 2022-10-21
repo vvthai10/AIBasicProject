@@ -28,7 +28,10 @@ class Node:
         self.getBonus = False
         self.total_rows = total_rows
         self.total_cols = total_cols
-        self.alpha = 255
+        self.alpha = 255    
+        self.portal_num = -1      
+        pygame.init()
+        self.normal_font = pygame.font.SysFont('Arial', 12)  
 
 
     def change_alpha(self):
@@ -67,8 +70,8 @@ class Node:
     def is_pickups(self):
         return self.color == BLUE
 
-    def reset(self):
-        self.color = WHITE
+    def reset(self):    
+        self.color = WHITE        
     
     def reset_distance(self):
         self.min_distance = -1
@@ -99,10 +102,9 @@ class Node:
     def make_pickups(self):
         self.color = BLUE
     
-    def make_portal(self, nums, des):
+    def make_portal(self, nums):
         self.color = GREY
         self.portal_num = nums
-        self.destination = des
     
     def make_path(self):
         if self.color != ORANGE and self.color != TURQUOISE and self.color != YELLOW and self.color != BLUE:
@@ -111,16 +113,16 @@ class Node:
         else:
             self.alpha = 120
 
-    def draw_portal(self, screen):
-        self.change_alpha()
-        s = pygame.Surface((self.size, self.size))  # the size of your rect
-        s.set_alpha(self.alpha)                # alpha level
-        s.fill(self.color)           # this fills the entire surface
-        screen.blit(s, (self.x, self.y))
-        # if not wall
-        if not self.is_wall() and self.is_portal():
-            screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
-                        (self.x + self.size/8, self.y + self.size/4))
+    # def draw_portal(self, screen):
+    #     self.change_alpha()
+    #     s = pygame.Surface((self.size, self.size))  # the size of your rect
+    #     s.set_alpha(self.alpha)                # alpha level
+    #     s.fill(self.color)           # this fills the entire surface
+    #     screen.blit(s, (self.x, self.y))
+    #     # if not wall
+    #     if not self.is_wall() and self.is_portal():
+    #         screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
+    #                     (self.x + self.size/8, self.y + self.size/4))
 
     def draw(self, screen):
         self.change_alpha()
@@ -129,6 +131,9 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        if not self.is_wall() and self.portal_num != -1:
+            screen.blit(self.normal_font.render(str(int(self.portal_num)), True, RED),
+                        (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
         self.neighbors = []
@@ -232,7 +237,7 @@ def merge_portal_grid(portal_list, grid):
         portal_queue.put(((point_pos[0], point_pos[1])))      
         destination = portal_list[point_pos]
         nums = nums + 1
-        grid[point_pos[0]][point_pos[1]].make_portal(nums, destination)
-        grid[destination[0]][destination[1]].make_portal(nums, point_pos)
+        grid[point_pos[0]][point_pos[1]].make_portal(nums/2)
+        grid[destination[0]][destination[1]].make_portal(nums/2)
 
     return portal_queue
