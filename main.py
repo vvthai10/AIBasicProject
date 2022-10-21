@@ -87,9 +87,6 @@ def run():
                     if(alg == "algo1"):
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
-                    if(alg == "algo2"):
-                        way, cost = algorithm_bonus_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
-                        is_alg_do = True
                 elif level == "level_3":
                     if(alg == "algo2"):
                         way, cost = algorithm_handle_bonus_pickup(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
