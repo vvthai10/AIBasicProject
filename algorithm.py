@@ -935,10 +935,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
 
 def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start, end, clock):
     def h_x(point):
-        if pickup_list:  # ignore end while this are pick up point
-            return point.min_distance
-        else:
-            return util.distance(point, end)
+        return point.min_distance
 
     def g_x(point):
         if point.is_bonus():
@@ -984,10 +981,14 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
     parents = {}             # contain positions
     checkpoint_pos = start.get_pos()
     open.put((heuristic(start), start))
-
+    mark_end = False
+    
     while not open.empty():
         value_heuristic, node = open.get()
         pos = node.get_pos()
+        if not pickup_list and not mark_end:
+           util.mark_trace(grid, end, 0, portal_list, is_distance=True)
+           mark_end = True
         if pos == end.get_pos():  # reach the end
             tmp_way = [pos]
             child = node.get_pos()
