@@ -62,7 +62,7 @@ def algorithm_dfs(draw, grid, start, end, clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-                        
+            way.insert(0,end.get_pos())    
             # print(f"Ways: {ways}")
             # In ra đường đi
             return reconstruct_path(way, grid, draw, clock)
@@ -122,7 +122,7 @@ def algorithm_ucs(draw,grid,start,end,clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-                        
+            way.insert(0,end.get_pos())               
             # print(f"Ways: {ways}")
             # In ra đường đi
             return reconstruct_path(way, grid, draw, clock)
@@ -178,7 +178,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-
+            way.insert(0,end.get_pos())   
             return reconstruct_path(way, grid, draw, clock)
             
 
@@ -192,6 +192,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
         draw()
 
     return [], 0
+
 
 def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
 
@@ -208,24 +209,19 @@ def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
     dist = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
     dist[start.get_pos()[0]][start.get_pos()[1]] = 0
 
-    # queue = PriorityQueue()
-    # queue.put((heuristic_2(start, end), (start.get_pos())))
+    queue = PriorityQueue()
+    queue.put((heuristic_1(start, end), (start.get_pos())))
 
-    queue = {}
-    queue[start.get_pos()] = heuristic_1(start, end)
 
-    #while not queue.empty():
-    while not len(queue) == 0:
+
+    while not queue.empty():
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-        # value_heuristic, (x_pos, y_pos) = queue.get()
-        # pos = (x_pos, y_pos)
-        (x_pos, y_pos) = getItem(queue)
-        value_heuristic = queue[(x_pos, y_pos)]
-        pos = (x_pos,y_pos)
-        queue.pop((x_pos, y_pos))
+        value_heuristic, (x_pos, y_pos) = queue.get()
+        pos = (x_pos, y_pos)
 
         if pos in path:
             continue
@@ -242,7 +238,7 @@ def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phi duong di voi thuat toan Greedy_BFS: {dist[end.get_pos()[0]][end.get_pos()[1]]}")
             return  reconstruct_path(way, grid, draw, clock)
 
@@ -256,24 +252,16 @@ def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
             if not (x_n, y_n) in path:
                 dist[x_n][y_n] = dist[pos[0]][pos[1]] + 1;
                 value = heuristic_1(neighbor, end)
-                if not (x_n, y_n) in queue:
-                    queue[neighbor.get_pos()] = value
-                    parents[neighbor.get_pos()] = pos
-                else:
-                    if(queue[neighbor.get_pos()] > value):
-                        queue[neighbor.get_pos()] = value
-                        parents[neighbor.get_pos()] = pos
+                queue.put((value,(x_n,y_n)))
+                parents[neighbor.get_pos()] = pos
+
         clock.tick(FPS)
         draw()
 
     return [], 0
 
 
-    def heuristic_1(neighbor, end):
-        x1, y1 = neighbor.get_pos()
-        x2, y2 = end.get_pos()
 
-        return (x1 - x2) ** 2 + (y1 - y2) ** 2
 
 def algorithm_greedy_bfs_heuristic_2(draw, grid, start, end, clock):
 
@@ -290,24 +278,19 @@ def algorithm_greedy_bfs_heuristic_2(draw, grid, start, end, clock):
     dist = [[0 for _ in range(len(grid[0]))] for _ in range(len(grid))]
     dist[start.get_pos()[0]][start.get_pos()[1]] = 0
 
-    # queue = PriorityQueue()
-    # queue.put((heuristic_2(start, end), (start.get_pos())))
+    queue = PriorityQueue()
+    queue.put((heuristic_2(start, end), (start.get_pos())))
 
-    queue = {}
-    queue[start.get_pos()] = heuristic_2(start, end)
 
-    #while not queue.empty():
-    while not len(queue) == 0:
+
+    while not queue.empty():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-        # value_heuristic, (x_pos, y_pos) = queue.get()
-        # pos = (x_pos, y_pos)
-        (x_pos, y_pos) = getItem(queue)
-        value_heuristic = queue[(x_pos, y_pos)]
-        pos = (x_pos,y_pos)
-        queue.pop((x_pos, y_pos))
+        value_heuristic, (x_pos, y_pos) = queue.get()
+        pos = (x_pos, y_pos)
+
 
         if pos in path:
             continue
@@ -324,7 +307,7 @@ def algorithm_greedy_bfs_heuristic_2(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phi duong di voi thuat toan Greedy_BFS: {dist[end.get_pos()[0]][end.get_pos()[1]]}")
             return  reconstruct_path(way, grid, draw, clock)
 
@@ -338,24 +321,15 @@ def algorithm_greedy_bfs_heuristic_2(draw, grid, start, end, clock):
             if not (x_n, y_n) in path:
                 dist[x_n][y_n] = dist[pos[0]][pos[1]] + 1;
                 value = heuristic_2(neighbor, end)
-                if not (x_n, y_n) in queue:
-                    queue[neighbor.get_pos()] = value
-                    parents[neighbor.get_pos()] = pos
-                else:
-                    if(queue[neighbor.get_pos()] > value):
-                        queue[neighbor.get_pos()] = value
-                        parents[neighbor.get_pos()] = pos
+                queue.put((value,(x_n,y_n)))
+                parents[neighbor.get_pos()] = pos
+
         clock.tick(FPS)
         draw()
 
     return [], 0
 
 
-    def heuristic_1(neighbor, end):
-        x1, y1 = neighbor.get_pos()
-        x2, y2 = end.get_pos()
-
-        return (x1 - x2) ** 2 + (y1 - y2) ** 2
 
 
 
@@ -533,7 +507,7 @@ def algorithm_astar_heuristic_1(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
             return reconstruct_path(way, grid, draw, clock)
         
@@ -608,7 +582,7 @@ def algorithm_astar_heuristic_2(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
             return reconstruct_path(way, grid, draw, clock)
         
