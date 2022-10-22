@@ -35,7 +35,7 @@ class Node:
 
 
     def change_alpha(self):
-        if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
+        if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE or self.color == BLUE or self.color == YELLOW):
             self.alpha = self.alpha - 20
     def get_pos(self):
         return self.row, self.col
@@ -84,7 +84,7 @@ class Node:
             self.color = GREEN
             self.alpha = 255
         else:
-            self.alpha = 200
+            self.alpha = 180
     
     # It use in A* ~ I don't sure.
     def make_closed(self):
@@ -111,7 +111,7 @@ class Node:
             self.color = PURPLE
             self.alpha = 255
         else:
-            self.alpha = 120
+            self.alpha = 150
 
     # def draw_portal(self, screen):
     #     self.change_alpha()
