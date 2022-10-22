@@ -966,7 +966,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
 
         while not pickups.empty():
             (r_cur, c_cur) = pickups.get()
-            # print(f"Pick up: {(r_cur, c_cur)}")
+            print(f"Pick up: {(r_cur, c_cur)}")
             if check_points_in_area(start_pos, (r_bottom, c_bottom), (r_cur, c_cur), 0):
                 pickups_1.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
@@ -1058,7 +1058,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
 
             while not opens.empty():
                 f_prev, (cur_pos) = opens.get()
-                # print(f"Start with pos: {cur_pos}")
+                print(f"Start with pos: {cur_pos} to end: {end_cur_pos}")
                 
                 closed.append(cur_pos)
 
