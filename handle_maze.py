@@ -35,7 +35,7 @@ class Node:
 
 
     def change_alpha(self):
-        if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE or self.color == BLUE or self.color == YELLOW):
+        if self.alpha > 100 and (self.color == GREEN or self.color == PURPLE):
             self.alpha = self.alpha - 20
     def get_pos(self):
         return self.row, self.col
@@ -111,7 +111,7 @@ class Node:
             self.color = PURPLE
             self.alpha = 255
         else:
-            self.alpha = 150
+            self.alpha = 120
 
     # def draw_portal(self, screen):
     #     self.change_alpha()
@@ -131,6 +131,10 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        if self.is_bonus():
+            print("Draw bonus")
+            screen.blit(self.normal_font.render(str(int(self.bonus)), True, BLACK),
+                        (self.x + self.size/4, self.y + self.size/4))
         if not self.is_wall() and self.portal_num != -1:
             screen.blit(self.normal_font.render(str(int(self.portal_num)), True, WHITE),
                         (self.x + self.size/4, self.y + self.size/4))
