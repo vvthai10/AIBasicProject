@@ -62,7 +62,7 @@ def algorithm_dfs(draw, grid, start, end, clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-                        
+            way.insert(0,end.get_pos())    
             # print(f"Ways: {ways}")
             # In ra đường đi
             return reconstruct_path(way, grid, draw, clock)
@@ -122,7 +122,7 @@ def algorithm_ucs(draw,grid,start,end,clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-                        
+            way.insert(0,end.get_pos())               
             # print(f"Ways: {ways}")
             # In ra đường đi
             return reconstruct_path(way, grid, draw, clock)
@@ -178,7 +178,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-
+            way.insert(0,end.get_pos())   
             return reconstruct_path(way, grid, draw, clock)
             
 
@@ -238,7 +238,7 @@ def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phi duong di voi thuat toan Greedy_BFS: {dist[end.get_pos()[0]][end.get_pos()[1]]}")
             return  reconstruct_path(way, grid, draw, clock)
 
@@ -307,7 +307,7 @@ def algorithm_greedy_bfs_heuristic_2(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phi duong di voi thuat toan Greedy_BFS: {dist[end.get_pos()[0]][end.get_pos()[1]]}")
             return  reconstruct_path(way, grid, draw, clock)
 
@@ -507,7 +507,7 @@ def algorithm_astar_heuristic_1(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
             return reconstruct_path(way, grid, draw, clock)
         
@@ -582,7 +582,7 @@ def algorithm_astar_heuristic_2(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
 
-            
+            way.insert(0,end.get_pos())   
             print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
             return reconstruct_path(way, grid, draw, clock)
         
