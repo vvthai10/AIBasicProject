@@ -880,6 +880,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
 def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock):
     WAYS_TOTAL = []
+    pickup_checked = []
 
     def check_points_in_area(top, down, point, approxi):
         max_r = max(top[0], down[0]) + approxi
@@ -901,12 +902,12 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         start_pos = start.get_pos()
 
         # Phạm vi khu vực 1: Start => góc dưới ngược với góc của điểm end
-        r_bottom = (len(grid) - 1) if (end_pos[0] < start_pos[0]) else 0
-        c_bottom = (len(grid[0])  - 1) if (end_pos[1] == 0) else 0
+        r_bottom = (len(grid) - 1) if (end_pos[0] > start_pos[0]) else 0
+        c_bottom = (len(grid[0])  - 1) if (end_pos[1] < start_pos[1]) else 0
 
         # Phạm vi khu vực 1: Start => góc trên ngược với góc của điểm end
-        r_top = (len(grid) - 1) if (end_pos[0] > start_pos[0]) else 0
-        c_top = (len(grid[0])  - 1) if (end_pos[1] == 0) else 0
+        r_top = (len(grid) - 1) if (end_pos[0] < start_pos[0]) else 0
+        c_top = (len(grid[0])  - 1) if (end_pos[1] < start_pos[1]) else 0
 
         # Phạm vi 3 là start -> center
         # Phạm vi 4 là center -> end
@@ -928,6 +929,14 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         pickups_4 = PriorityQueue()
         bonus_4 = PriorityQueue()
 
+        c_max = max(c_center, start_pos[1])
+        c_min = min(c_center, start_pos[1])
+        
+        print(f"S1 {start_pos, (r_bottom, c_bottom)}")
+        print(f"S2 {start_pos, (r_top, c_top)}")
+        print(f"S3 {(c_min, c_max)}")
+        print(f"S4 another")
+
 
         while not pickups.empty():
             (r_cur, c_cur) = pickups.get()
@@ -936,7 +945,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 pickups_1.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
                 pickups_2.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
-            elif check_points_in_area((len(grid) - 1, start_pos[1]), (0, c_center), (r_cur, c_cur), 0):
+            elif c_cur in range(c_min, c_max):
                 pickups_3.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             else:
                 pickups_4.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
@@ -1042,6 +1051,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     WAYS_TOTAL.extend(ways)
                     parents = {}
                     closed = []
+                    pickup_checked.append(end_cur_pos)
                     start_cur_pos = end_cur_pos
                     break
                 
@@ -1075,7 +1085,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
                     # WARNING!!!!!!!!
                     new_pos = neighbor.get_pos()
-                    if not new_pos in closed:
+                    if not new_pos in closed and not new_pos in pickup_checked:
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
                         g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
@@ -1120,13 +1130,13 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
     end_cur_pos = None
 
     start_cur_pos, end_cur_pos = handle_pickups(pickups_1, bonus_1, start_cur_pos, end_cur_pos)
-    # print(f"Finish 1: {start_cur_pos} and {end_cur_pos}")
+    print(f"Finish 1: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_2, bonus_2, start_cur_pos, end_cur_pos)
-    # print(f"Finish 2: {start_cur_pos} and {end_cur_pos}")
+    print(f"Finish 2: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_3, bonus_3, start_cur_pos, end_cur_pos)
-    # print(f"Finish 3: {start_cur_pos} and {end_cur_pos}")
+    print(f"Finish 3: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_4, bonus_4, start_cur_pos, end_cur_pos)
-    # print(f"Finish 4: {start_cur_pos} and {end_cur_pos}")
+    print(f"Finish 4: {start_cur_pos} and {end_cur_pos}")
 
     # Từ cur -> end + các điểm bonus có thể ăn được
     # Sẽ check trong bonus_4 thôi và trong cái diện tích giới hạn
