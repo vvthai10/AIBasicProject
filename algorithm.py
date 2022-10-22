@@ -314,11 +314,8 @@ maze 9: -472
 
 
 def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_list, start, end, clock):
-    def h_x(point):
-        if pickup_list:  # ignore end while this are pick up points left
-            return point.min_distance
-        else:
-            return util.distance(point, end)
+    def h_x(point):        
+        return point.min_distance
 
     def g_x(point):
         if point.is_bonus():
@@ -364,10 +361,13 @@ def algorithm_bonus_pickup_astar(draw, grid, bonus_list, pickup_list, portal_lis
     parents = {}             # contain positions
     checkpoint_pos = start.get_pos()
     open.put((heuristic(start), start))
-
+    mark_end = False
     while not open.empty():
         value_heuristic, node = open.get()
         pos = node.get_pos()
+        if not pickup_list and not mark_end:
+           util.mark_trace(grid, end, 0, portal_list, is_distance=True)
+           mark_end = True
         if pos == end.get_pos():  # reach the end
             if pickup_list:
                return False 

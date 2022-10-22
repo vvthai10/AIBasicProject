@@ -17,7 +17,7 @@ def update_node(point, config, is_distance=False):  # use for both heat and dis
         else:
             point.min_distance = min(config, point.min_distance)
     else:
-        point.heat_value = min(config, point.heat_value)
+        point.heat_value = min(config, point.heat_value)        
 
 
 def minimal_congif(config, is_distance=False):

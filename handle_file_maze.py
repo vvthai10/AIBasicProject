@@ -3,15 +3,6 @@ from operator import length_hint
 
 def read_file(file_name: str = 'maze.txt'):
     f = open(file_name, 'r')
-    # stats = []
-    # stats = map(int, next(f)[:-1].split(' '))
-    # print(stats)
-    # print(length_hint(stats))
-    # if length_hint(stats) == 1:
-    #   n_bonus_points = stats
-    # elif length_hint(stats) == 2:
-    #   n_bonus_points, n_pickup_points = stats
-    # else:
     n_bonus_points, n_pickup_points, n_portal = map(int, next(f)[:-1].split(' '))
     bonus_points = []
     pickup_points = []

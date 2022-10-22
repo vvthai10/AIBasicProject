@@ -144,10 +144,10 @@ class Node:
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
         if not self.is_wall():
-            if self.is_bonus():
-                screen.blit(self.bold_font.render(str(round(self.bonus, 2)), True, (0, 0, 0)),
-                            (self.x + self.size/4, self.y + self.size/4))
-            elif self.is_portal():
+            # if self.is_bonus():
+            #     screen.blit(self.bold_font.render(str(round(self.bonus, 2)), True, (0, 0, 0)),
+            #                 (self.x + self.size/4, self.y + self.size/4))
+            if self.is_portal():
                 screen.blit(self.bold_font.render(str(int(self.portal_num/2)), True, WHITE),
                             (self.x + self.size/2.5, self.y + self.size/3))
 
@@ -337,7 +337,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
     # wait()
-    addtional_map = 'none'
+    addtional_map = "heat"
     run = True
     while run:
         draw(screen, grid, ROWS, COLS, width, height, addtional_map)
@@ -372,7 +372,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
 """
 Start simulation
 """
-maze_name = '11'
+maze_name = '4'
 maze, bonus_points, pickup_points, portal_list = read_file(
     "./maze/maze_" + maze_name + ".txt")
 
