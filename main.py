@@ -7,8 +7,11 @@ import utility as util
 from handle_file_maze import *
 from handle_maze import *
 from handle_visualize import make_image, Video
-from algorithm import *
-
+from algorithms.algorithm import *
+# import sys
+# sys.path.insert(0, './alogorithms')
+# # importing the hello
+# from algorithm import *
 # Build all need to visualization
 """
 Description: Node is cell in matrix, it has another state with different color:
@@ -23,10 +26,11 @@ Description: Node is cell in matrix, it has another state with different color:
 def run():
     levels, files = list_file()
 
+    # print(levels)
     
     for level in levels:
         for file in files[level]:
-            maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
+            maze, bonus_points, pickup_points, portal_points = read_file("./source/input/" + level + "/" + file)
             
             ROWS = len(maze)
             COLS = len(maze[0])
@@ -103,18 +107,18 @@ def run():
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):
-                    print("đã chạy xong thuật toán", alg, "với bản đồ", file, " thuộc folder", level )
+                    print("Done ", alg, " with maze", file, " in folder", level )
                     dir_output = ""
                     if(alg.split("_")[0] == "gbfs" or alg.split("_")[0] == "astar"):
-                        dir_output = level + "\\" + file.split(".")[0] + "\\" + alg.split("_")[0]
+                        dir_output = level + "/" + file.split(".")[0] + "/" + alg.split("_")[0]
                     else:
-                        dir_output = level + "\\" + file.split(".")[0] + "\\" + alg
+                        dir_output = level + "/" + file.split(".")[0] + "/" + alg
                     create_folder(dir_output)               
-                    write_file(dir_output + "\\" + alg + ".txt", cost )
-                    video.make_mp4(dir_output+ "\\" + alg)
+                    write_file(dir_output + "/" + alg + ".txt", cost )
+                    video.make_mp4(dir_output+ "/" + alg)
                     video.destroy_png()
-                    maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
-                    make_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "\\" + alg )
+                    maze, bonus_points, pickup_points, portal_points = read_file("./source/input/" + level + "/" + file)
+                    make_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "/" + alg )
                 pygame.quit()
             
 
@@ -170,28 +174,6 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
             if event.type == pygame.QUIT:
                 run = False
 
-# NOTE: Phần này dùng để khi nhấn phím cách thì thuật toán mới chạy được
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and start and end:
-                    for row in grid:
-                        for node in row:
-                            node.update_neighbors(grid)
-
-                    # if event.key == pygame.K_SPACE and start and end:
-                #      run = False
-
-
-# NOTE: Phần này là mặc định vào chương trình là thuật toán tự chạy và lưu video luôn
-        # for row in grid:
-        #     for node in row:
-        #         node.update_neighbors(grid)
-        # algorithm_dfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # # algorithm_bfs(lambda: draw(screen, grid, ROWS, COLS, width, height), grid, start, end, clock)
-        # run = False
-    algorithm_bonus_pickup_astar(lambda: draw(
-                        screen, grid, ROWS, COLS, width, height, video), grid, bonus_points, pickup_points,portal_list, start, end, clock)
-                
-    pygame.quit()
 '''
 
 """

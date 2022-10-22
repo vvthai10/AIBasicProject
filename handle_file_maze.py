@@ -1,14 +1,14 @@
-from importlib.resources import path
+# from importlib.resources import path
 import os
 
 
-def read_file(file_name: str = 'maze.txt'):
+def read_file(file_name):
   f = open(file_name,'r')
   n_points = int(next(f)[:-1])
   points = []
   portals = {}
   
-  print(f"points: {n_points}")
+  # print(f"points: {n_points}")
   for i in range(n_points):
     line = next(f)[:-1]
     if len(line.split(' ')) == 3:
@@ -42,17 +42,21 @@ def write_file(file_name, cost = 0):
     f.write(str(cost))
     f.close()
 
-DIR_INPUT = "./input/"
+DIR_INPUT = "./source/input/"
 def list_file():
-  #tất cả các folder trong input : level1,level2,...
+  
   dir_list = os.listdir(DIR_INPUT)
-  files = {} # chứa tên file trong các folder:  files[level1] = ['input1.txt','input2.txt',...]
+  dir_list.sort()
+  files = {} 
   for level in dir_list:
     files[level] = os.listdir(DIR_INPUT + level)
+    # print(type(files[level]))
+    files[level].sort()
+    # print(files[level])
   
   return dir_list, files
 
-DIR_OUTPUT = "./output/"
+DIR_OUTPUT = "./source/output/"
 def create_folder(directory):
   if(not os.path.exists(DIR_OUTPUT + directory)):
     os.makedirs(DIR_OUTPUT + directory)

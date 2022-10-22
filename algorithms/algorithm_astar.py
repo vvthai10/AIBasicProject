@@ -1,4 +1,4 @@
-from function import *
+from algorithms.shared_function import *
 
 
 def algorithm_astar_heuristic_1(draw, grid, start, end, clock):
@@ -35,7 +35,7 @@ def algorithm_astar_heuristic_1(draw, grid, start, end, clock):
         f_prev = open[(x_cur,y_cur)]
         open.pop((x_cur,y_cur))
         if(grid[x_cur][y_cur].is_end()):
-            print("Finally\n")
+            # print("Finally\n")
             pos_start = start.get_pos()
 
             child = end.get_pos()
@@ -110,7 +110,7 @@ def algorithm_astar_heuristic_2(draw, grid, start, end, clock):
         f_prev = open[(x_cur,y_cur)]
         open.pop((x_cur,y_cur))
         if(grid[x_cur][y_cur].is_end()):
-            print("Finally\n")
+            # print("Finally\n")
             pos_start = start.get_pos()
 
             child = end.get_pos()

@@ -1,4 +1,4 @@
-from function import *
+from algorithms.shared_function import *
 
 
 def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):

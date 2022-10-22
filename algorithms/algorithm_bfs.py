@@ -1,4 +1,4 @@
-from function import *
+from algorithms.shared_function import *
 def algorithm_bfs(draw, grid, start, end, clock):
     way = []
     path = []

@@ -1,9 +1,0 @@
-0
-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-                           x 
-x  x                  xxxxxx
-x  xx          xxxxx       x
-x          S               x
-x  xx       xxxx           x
-x                  xxx     x
-xxxxxxxxxxxxxxxxxxxxxxxxxxxx

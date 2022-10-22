@@ -1,4 +1,4 @@
-from function import *
+from algorithms.shared_function import *
 
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
@@ -318,10 +318,10 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         c_max = max(c_center, start_pos[1])
         c_min = min(c_center, start_pos[1])
         
-        print(f"S1 {start_pos, (r_bottom, c_bottom)}")
-        print(f"S2 {start_pos, (r_top, c_top)}")
-        print(f"S3 {(c_min, c_max)}")
-        print(f"S4 another")
+        # print(f"S1 {start_pos, (r_bottom, c_bottom)}")
+        # print(f"S2 {start_pos, (r_top, c_top)}")
+        # print(f"S3 {(c_min, c_max)}")
+        # print(f"S4 another")
 
 
         while not pickups.empty():
@@ -516,13 +516,13 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
     end_cur_pos = None
 
     start_cur_pos, end_cur_pos = handle_pickups(pickups_1, bonus_1, start_cur_pos, end_cur_pos)
-    print(f"Finish 1: {start_cur_pos} and {end_cur_pos}")
+    # print(f"Finish 1: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_2, bonus_2, start_cur_pos, end_cur_pos)
-    print(f"Finish 2: {start_cur_pos} and {end_cur_pos}")
+    # print(f"Finish 2: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_3, bonus_3, start_cur_pos, end_cur_pos)
-    print(f"Finish 3: {start_cur_pos} and {end_cur_pos}")
+    # print(f"Finish 3: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_4, bonus_4, start_cur_pos, end_cur_pos)
-    print(f"Finish 4: {start_cur_pos} and {end_cur_pos}")
+    # print(f"Finish 4: {start_cur_pos} and {end_cur_pos}")
 
     # Từ cur -> end + các điểm bonus có thể ăn được
     # Sẽ check trong bonus_4 thôi và trong cái diện tích giới hạn

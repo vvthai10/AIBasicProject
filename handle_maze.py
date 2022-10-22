@@ -1,6 +1,6 @@
 import pygame
 from init import *
-from contextlib import nullcontext
+# from contextlib import nullcontext
 from copy import copy
 from pickle import TRUE
 from queue import PriorityQueue
@@ -10,7 +10,6 @@ from pygame.locals import *
 import math
 import random
 from handle_file_maze import *
-
 from init import *
 from handle_visualize import make_image, Video
 
@@ -31,7 +30,6 @@ class Node:
         self.alpha = 255    
         self.portal_num = -1      
         pygame.init()
-        self.normal_font = pygame.font.SysFont('Arial', 12)  
 
 
     def change_alpha(self):
@@ -130,13 +128,19 @@ class Node:
         s.set_alpha(self.alpha)                # alpha level
         s.fill(self.color)           # this fills the entire surface
         screen.blit(s, (self.x, self.y))
-        # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
+        # r,g,b = self.color
+        # rgba = (r,g,b, self.alpha)
+        # print(rgba)
+        # pygame.draw.rect(screen, rgba, (self.x, self.y, self.size, self.size))
+        # shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+        # pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+        # surface.blit(shape_surf, rect)
+        font = pygame.font.SysFont('Arial', 20)  
         if self.is_bonus():
-            print("Draw bonus")
-            screen.blit(self.normal_font.render(str(int(self.bonus)), True, BLACK),
+            screen.blit(font.render(str(int(self.bonus)), True, BLACK),
                         (self.x + self.size/4, self.y + self.size/4))
         if not self.is_wall() and self.portal_num != -1:
-            screen.blit(self.normal_font.render(str(int(self.portal_num)), True, WHITE),
+            screen.blit(font.render(str(int(self.portal_num)), True, WHITE),
                         (self.x + self.size/4, self.y + self.size/4))
 
     def update_neighbors(self, grid):
@@ -210,7 +214,7 @@ def merge_maze_grid(maze, grid, ROWS,COLS):
     return start, end
 
 def merge_bonus_grid(bonus_points, grid):
-    # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+    
     bonus_queue = PriorityQueue()
     i = 0
     for point in bonus_points:
@@ -219,11 +223,11 @@ def merge_bonus_grid(bonus_points, grid):
         grid[point[0]][point[1]].bonus = point[2]
         i += 1
     
-    print(i)
+    # print(i)
     return bonus_queue
 
 def merge_pickups_grid(pickup_points, grid):
-    # Sẽ sử dụng priority queue để lưu danh sách các điểm thưởng, điểm thưởng sẽ được chuyển thành dương để dễ lưu
+    
     pickups_queue = PriorityQueue()
 
     for point in pickup_points:
@@ -232,7 +236,7 @@ def merge_pickups_grid(pickup_points, grid):
         grid[point[0]][point[1]].bonus = 0
 
     return pickups_queue
-#lưu đường đi ra khỏi mê cung thành file .png
+
 
 def merge_portal_grid(portal_list, grid):    
     portal_queue = PriorityQueue()
