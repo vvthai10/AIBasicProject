@@ -2,6 +2,8 @@ import datetime as dt
 from algorithms.shared_function import *
 import numpy as np
 
+from utility import mark_trace
+
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
     def check_space_with_line(point, start, end):
@@ -279,8 +281,6 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
     def h_x(point):
         if pickup_list:  # ignore end while this are pick up point
             return point.min_distance
-        else:
-            return util.distance(point, end)
 
     def g_x(point):
         if point.is_bonus():
@@ -328,10 +328,15 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
     checkpoint_pos = start.get_pos()
     open.put((heuristic(start), start))
     start_time = dt.datetime.now()
-
+    mark_end = False
+    
     while not open.empty():
         value_heuristic, node = open.get()
         pos = node.get_pos()
+        if not pickup_list and not mark_end: # if there are no pick up point left
+            mark_trace(grid, end, 0, portal_list, is_distance=True)
+            mark_end = True
+            
         if pos == end.get_pos():  # reach the end
             tmp_way = [pos]
             child = node.get_pos()
