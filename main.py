@@ -57,8 +57,8 @@ def run():
                     for node in row:
                         node.update_neighbors(grid)            
                 
-                # SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
-                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
+                # SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
                 is_alg_do = False # kiem tra co thuat toan nao chay  khong
                 if level == "level_1":
                     if(alg == "dfs"):

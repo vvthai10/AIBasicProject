@@ -880,6 +880,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
 
 def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock):
     WAYS_TOTAL = []
+    END_POS = []
     pickup_checked = []
 
     def check_points_in_area(top, down, point, approxi):
@@ -932,10 +933,10 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         c_max = max(c_center, start_pos[1])
         c_min = min(c_center, start_pos[1])
         
-        print(f"S1 {start_pos, (r_bottom, c_bottom)}")
-        print(f"S2 {start_pos, (r_top, c_top)}")
-        print(f"S3 {(c_min, c_max)}")
-        print(f"S4 another")
+        # print(f"S1 {start_pos, (r_bottom, c_bottom)}")
+        # print(f"S2 {start_pos, (r_top, c_top)}")
+        # print(f"S3 {(c_min, c_max)}")
+        # print(f"S4 another")
 
 
         while not pickups.empty():
@@ -1037,6 +1038,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 closed.append(cur_pos)
 
                 if cur_pos == end_cur_pos:
+                    END_POS.append(end_cur_pos)
                     # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
                     child = end_cur_pos
                     parent = parents[child]
@@ -1061,8 +1063,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     v, (r, c) = bonus.get()
                     if (r, c) != cur_pos:
                         backup_bonus.put((v, (r, c))) 
-                    # else:
-                    #     print(f"Cur pos {(r, c)} is bonus")
+                    else:
+                        print(f"Cur pos {(r, c)} is bonus")
                 
                 while not backup_bonus.empty():
                     v, (r, c) = backup_bonus.get()
@@ -1085,8 +1087,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
                     # WARNING!!!!!!!!
                     new_pos = neighbor.get_pos()
-                    if not new_pos in closed and not new_pos in pickup_checked:
-                        # print(f"\tAdd neighbor {new_pos}")
+                    if not new_pos in closed and ( new_pos == end_cur_pos or not grid[new_pos[0]][new_pos[1]].is_pickups()) :
+                        print(f"\t\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
                         g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
                         # g_n =  g[cur_pos[0]][cur_pos[1]] + 1
@@ -1174,6 +1176,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 closed.append(cur_pos)
 
                 if cur_pos == end_cur_pos:
+                    END_POS.append(end_cur_pos)
                     # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
                     child = end_cur_pos
                     parent = parents[child]
@@ -1196,8 +1199,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
                     # WARNING!!!!!!!!
                     new_pos = neighbor.get_pos()
-                    if not new_pos in closed:
-                        # print(f"\tAdd neighbor {new_pos}")
+                    if not new_pos in closed and ( new_pos == end_cur_pos or not grid[new_pos[0]][new_pos[1]].is_pickups()):
+                        print(f"\t\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
                         g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
                         # g_n = g[cur_pos[0]][cur_pos[1]] + 1
@@ -1228,6 +1231,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         closed.append(cur_pos)
 
         if cur_pos == end_cur_pos:
+            END_POS.append(end_cur_pos)
             # start_cur_pos = end_cur_pos
             # Xây dựng đoạn đường từ điểm kết thúc hiện tại tới điểm đã xuất phát
             child = end_pos
@@ -1246,6 +1250,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     
             # print(WAYS_TOTAL)
             WAYS_TOTAL.reverse()
+            print(END_POS)
             
             #print(g[end_pos[0]][end_pos[1]])
 
@@ -1259,8 +1264,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
             # WARNING!!!!!!!!
             new_pos = neighbor.get_pos()
-            if not new_pos in closed:
-                # print(f"\tAdd neighbor {new_pos}")
+            if not new_pos in closed and ( new_pos == end_cur_pos or not grid[new_pos[0]][new_pos[1]].is_pickups()):
+                print(f"\t\tAdd neighbor {new_pos}")
                 # NOTE: g[r][c].get_bonus()
                 g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
                 # g_n = g[cur_pos[0]][cur_pos[1]] + 1
@@ -1274,6 +1279,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         
         clock.tick(FPS)
         draw()
+
 
 def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start, end, clock):
     def h_x(point):

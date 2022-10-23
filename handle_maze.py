@@ -132,7 +132,6 @@ class Node:
         screen.blit(s, (self.x, self.y))
         # pygame.draw.rect(screen, self.color, (self.x, self.y, self.size, self.size))
         if self.is_bonus():
-            print("Draw bonus")
             screen.blit(self.normal_font.render(str(int(self.bonus)), True, BLACK),
                         (self.x + self.size/4, self.y + self.size/4))
         if not self.is_wall() and self.portal_num != -1:
