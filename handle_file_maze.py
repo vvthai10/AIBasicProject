@@ -47,6 +47,9 @@ def list_file():
   
   dir_list = os.listdir(DIR_INPUT)
   dir_list.sort()
+  dir_list.remove('advance')
+  dir_list.append('advance')
+  # print(dir_list)
   files = {} 
   for level in dir_list:
     files[level] = os.listdir(DIR_INPUT + level)

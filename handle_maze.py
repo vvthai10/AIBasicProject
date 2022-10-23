@@ -15,7 +15,7 @@ from init import *
 from handle_visualize import make_image, Video
 
 pygame.font.init()
-default_font = pygame.font.SysFont('Arial', 14)  
+default_font = pygame.font.SysFont('Arial', 10)  
 
 class Node:
     def __init__(self, row, col, size, total_rows, total_cols):

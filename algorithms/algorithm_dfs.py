@@ -30,7 +30,7 @@ def algorithm_dfs(draw, grid, start, end, clock):
             end_time = dt.datetime.now()
             time_diff = (end_time - start_time)
             execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            print(f"\tFinish: {execution_time} ms.")
             pos_start = start.get_pos()
 
             child = end.get_pos()            
