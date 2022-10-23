@@ -1,3 +1,4 @@
+from wsgiref.simple_server import demo_app
 import pygame
 from init import *
 # from contextlib import nullcontext
@@ -12,6 +13,9 @@ import random
 from handle_file_maze import *
 from init import *
 from handle_visualize import make_image, Video
+
+pygame.font.init()
+default_font = pygame.font.SysFont('Arial', 14)  
 
 class Node:
     def __init__(self, row, col, size, total_rows, total_cols):
@@ -30,7 +34,6 @@ class Node:
         self.alpha = 255    
         self.portal_num = -1      
         self.view_bonus = 1
-        pygame.init()
 
 
     def change_alpha(self):
@@ -121,9 +124,8 @@ class Node:
     #     # if not wall
     #     if not self.is_wall() and self.is_portal():
     #         screen.blit(self.normal_font.render(str(self.destination), True, (0, 0, 0)),
-    #                     (self.x + self.size/8, self.y + self.size/4))
-
-    def draw(self, screen):
+    #                     (self.x + self.size/8, self.y + self.size/4))    
+    def draw(self, screen, font = default_font):
         self.change_alpha()
         s = pygame.Surface((self.size, self.size))  # the size of your rect
         s.set_alpha(self.alpha)                # alpha level
@@ -135,8 +137,7 @@ class Node:
         # pygame.draw.rect(screen, rgba, (self.x, self.y, self.size, self.size))
         # shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
         # pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
-        # surface.blit(shape_surf, rect)
-        font = pygame.font.SysFont('Arial', 14)  
+        # surface.blit(shape_surf, rect)        
         if self.view_bonus < 0:
             screen.blit(font.render(str(int(self.view_bonus)), True, BLACK),
                         (self.x + self.size/4, self.y + self.size/4))

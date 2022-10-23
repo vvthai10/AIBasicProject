@@ -131,7 +131,7 @@ def run():
                     video.destroy_png()
                     maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
                     make_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "/" + alg )
-                pygame.quit()
+    pygame.quit()
             
 
 
