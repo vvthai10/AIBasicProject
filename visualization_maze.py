@@ -337,7 +337,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
     # draw once and wait for input (KEY space)
     # draw(screen, grid, ROWS, COLS, width, height, heatmap=include_heatmap)
     # wait()
-    addtional_map = "heat"
+    addtional_map = "none"
     run = True
     while run:
         draw(screen, grid, ROWS, COLS, width, height, addtional_map)
@@ -372,7 +372,7 @@ def main(screen, maze, bonus_points, pickup_points, portal_list, width, height):
 """
 Start simulation
 """
-maze_name = '4'
+maze_name = '8'
 maze, bonus_points, pickup_points, portal_list = read_file(
     "./maze/maze_" + maze_name + ".txt")
 
