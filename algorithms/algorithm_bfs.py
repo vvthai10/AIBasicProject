@@ -1,3 +1,4 @@
+import datetime as dt
 from algorithms.shared_function import *
 def algorithm_bfs(draw, grid, start, end, clock):
     way = []
@@ -6,6 +7,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
 
     queue = []
     queue.append(start.get_pos())
+    start_time = dt.datetime.now()
 
     while len(queue) != 0:
         for event in pygame.event.get():
@@ -33,6 +35,10 @@ def algorithm_bfs(draw, grid, start, end, clock):
                 child = parent
                 parent = parents[child]
             way.insert(0,end.get_pos())   
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
             
 

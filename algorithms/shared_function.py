@@ -9,7 +9,7 @@ from dis import dis
 def reconstruct_path(way, grid, draw, clock):
     way.reverse()
     cost = 0
-    print("List bonus have: ")
+    # print("List bonus have: ")
     total = 0
     for current in way:
         # print(grid[current[0]][current[1]].bonus)
@@ -21,7 +21,7 @@ def reconstruct_path(way, grid, draw, clock):
         cost = cost  + node.get_bonus()
         clock.tick(FPS)
         draw()
-    print ("Chi phi duong di la: ", cost)
+    print ("Road costs: ", cost)
     
     return way, cost
 def getItem(priorityQueue):

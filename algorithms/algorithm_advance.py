@@ -1,3 +1,4 @@
+import datetime as dt
 from algorithms.shared_function import *
 
 def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
@@ -114,6 +115,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
         bonus_queue.put((item_pri,(r, c, val)))
 
     isCheckOther = True
+    start_time = dt.datetime.now()
     while not bonus_queue.empty():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -144,6 +146,10 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
                 closed = []
                 # clean_path_parents_is_used()
                 WAYS_TOTAL.reverse()
+                end_time = dt.datetime.now()
+                time_diff = (end_time - start_time)
+                execution_time = time_diff.total_seconds() * 1000
+                print(f"Finish: {execution_time} ms.")
                 return reconstruct_path(WAYS_TOTAL, grid, draw, clock)
 
             if (r, c) == pos_end:
@@ -172,7 +178,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
                         r_next, c_next = end.get_pos()
                     # Tìm điểm thỏa mãn        
                     for item_other in bonus_other:
-                        print(f"Type of NNNNNNN {type(bonus_other)}")
+                        # print(f"Type of NNNNNNN {type(bonus_other)}")
                         val_other = item_other
                         (r_other, c_other) = bonus_other[item_other]
                         if not (r_other, c_other) in closed and not (r_other, c_other) in closed_bonus:
@@ -244,6 +250,10 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
             WAYS_TOTAL.extend(ways)
             # clean_path_parents_is_used()
             WAYS_TOTAL.reverse()
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")
             return reconstruct_path(WAYS_TOTAL, grid, draw, clock)
         
         grid[r][c].make_open()
@@ -519,6 +529,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
     start_cur_pos = start_pos
     end_cur_pos = None
 
+    start_time = dt.datetime.now()
     start_cur_pos, end_cur_pos = handle_pickups(pickups_1, bonus_1, start_cur_pos, end_cur_pos)
     # print(f"Finish 1: {start_cur_pos} and {end_cur_pos}")
     start_cur_pos, end_cur_pos = handle_pickups(pickups_2, bonus_2, start_cur_pos, end_cur_pos)
@@ -638,6 +649,11 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
             WAYS_TOTAL.reverse()
             
             #print(g[end_pos[0]][end_pos[1]])
+            
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")
 
 
 
@@ -717,6 +733,7 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
     parents = {}             # contain positions
     checkpoint_pos = start.get_pos()
     open.put((heuristic(start), start))
+    start_time = dt.datetime.now()
 
     while not open.empty():
         value_heuristic, node = open.get()
@@ -734,6 +751,10 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
             way = way + tmp_way
             
             way.reverse()   #phục vụ cho việc vẽ ra file .png
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
         elif node != start:
             node.make_open()

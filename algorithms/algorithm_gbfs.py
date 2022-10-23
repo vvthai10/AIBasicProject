@@ -1,3 +1,4 @@
+import datetime as dt
 from algorithms.shared_function import *
 
 
@@ -18,6 +19,7 @@ def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
 
     queue = PriorityQueue()
     queue.put((heuristic_1(start, end), (start.get_pos())))
+    start_time = dt.datetime.now()
 
 
 
@@ -47,6 +49,10 @@ def algorithm_greedy_bfs_heuristic_1(draw, grid, start, end, clock):
 
             way.insert(0,end.get_pos())   
             print(f"Chi phi duong di voi thuat toan Greedy_BFS: {dist[end.get_pos()[0]][end.get_pos()[1]]}")
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")
             return  reconstruct_path(way, grid, draw, clock)
 
         node = grid[pos[0]][pos[1]]
@@ -84,6 +90,7 @@ def algorithm_greedy_bfs_heuristic_2(draw, grid, start, end, clock):
 
     queue = PriorityQueue()
     queue.put((heuristic_2(start, end), (start.get_pos())))
+    start_time = dt.datetime.now()
 
 
 

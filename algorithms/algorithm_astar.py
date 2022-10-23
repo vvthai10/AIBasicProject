@@ -1,3 +1,4 @@
+import datetime as dt
 from algorithms.shared_function import *
 
 
@@ -24,6 +25,7 @@ def algorithm_astar_heuristic_1(draw, grid, start, end, clock):
     # (f_n, (pos))
     #open.put(( 1 + mahattan_dis(start, end), (start.get_pos())))
     open[start.get_pos()] = 1 + euclid_dis(start, end)
+    start_time = dt.datetime.now()
     #while not open.empty():
     while(not len(open) == 0):
         # for event in pygame.event.get():
@@ -99,6 +101,7 @@ def algorithm_astar_heuristic_2(draw, grid, start, end, clock):
     # (f_n, (pos))
     #open.put(( 1 + mahattan_dis(start, end), (start.get_pos())))
     open[start.get_pos()] = 1 + mahattan_dis(start, end)
+    start_time = dt.datetime.now()
     #while not open.empty():
     while(not len(open) == 0):
         # for event in pygame.event.get():
@@ -122,6 +125,10 @@ def algorithm_astar_heuristic_2(draw, grid, start, end, clock):
 
             way.insert(0,end.get_pos())   
             print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
         
         if not grid[x_cur][y_cur].is_start():

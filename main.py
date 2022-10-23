@@ -66,37 +66,48 @@ def run():
                 is_alg_do = False # kiem tra co thuat toan nao chay  khong
                 if level == "level_1":
                     if(alg == "dfs"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_dfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                     elif(alg== "bfs"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way,cost = algorithm_bfs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True                        
                     elif(alg == "ucs"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_ucs(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                     elif(alg == "gbfs_heuristic_1"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost =algorithm_greedy_bfs_heuristic_1(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                     elif(alg == "gbfs_heuristic_2"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost =algorithm_greedy_bfs_heuristic_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                     
                     elif(alg == "astar_heuristic_1"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_astar_heuristic_1(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True
                     else:
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_astar_heuristic_2(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, start, end, clock)
                         is_alg_do = True                        
                 elif level == "level_2":
                     if(alg == "algo1"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                         
                     if(alg == "algo2"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_bonus_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
                         is_alg_do = True
                 elif level == "level_3":
                     if(alg == "algo1"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_handle_bonus_pickup(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
                         is_alg_do = True
                     # if(alg == "algo2"):
@@ -104,6 +115,7 @@ def run():
                     #     is_alg_do = True
                 elif level == "advance":
                     if(alg == "algo1"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):

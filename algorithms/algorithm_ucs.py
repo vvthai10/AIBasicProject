@@ -1,3 +1,4 @@
+import datetime as dt
 from algorithms.shared_function import *
 
 def algorithm_ucs(draw,grid,start,end,clock):
@@ -7,6 +8,7 @@ def algorithm_ucs(draw,grid,start,end,clock):
 
     priorityQueue = {}
     priorityQueue[start.get_pos()] = 0
+    start_time = dt.datetime.now()
 
     while(len(priorityQueue) != 0):
         for event in pygame.event.get():
@@ -35,7 +37,11 @@ def algorithm_ucs(draw,grid,start,end,clock):
                 way.append(parent)
                 child = parent
                 parent = parents[child]
-            way.insert(0,end.get_pos())               
+            way.insert(0,end.get_pos())   
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"Finish: {execution_time} ms.")            
             # print(f"Ways: {ways}")
             # In ra đường đi
             return reconstruct_path(way, grid, draw, clock)
