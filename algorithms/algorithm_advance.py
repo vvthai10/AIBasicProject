@@ -283,9 +283,13 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
     def calc_space_2_points(A, B):
         return math.sqrt((A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2 )
 
+    def handle_space(A, B):
+        temp = calc_space_2_points(A, B)
+        return temp
+
     def get_points_areas():
-        end_pos = end.get_pos()
         start_pos = start.get_pos()
+        end_pos = end.get_pos()
 
         # Phạm vi khu vực 1: Start => góc dưới ngược với góc của điểm end
         r_bottom = (len(grid) - 1) if (end_pos[0] > start_pos[0]) else 0
@@ -328,13 +332,13 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
             (r_cur, c_cur) = pickups.get()
             # print(f"Pick up: {(r_cur, c_cur)}")
             if check_points_in_area(start_pos, (r_bottom, c_bottom), (r_cur, c_cur), 0):
-                pickups_1.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+                pickups_1.put((handle_space(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             elif check_points_in_area(start_pos, (r_top, c_top), (r_cur, c_cur), 0):
-                pickups_2.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+                pickups_2.put((handle_space(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             elif c_cur in range(c_min, c_max):
-                pickups_3.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+                pickups_3.put((handle_space(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
             else:
-                pickups_4.put((calc_space_2_points(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
+                pickups_4.put((handle_space(start_pos, (r_cur, c_cur)), (r_cur, c_cur)))
 
         while not bonus.empty():
             value, (r_cur, c_cur) = bonus.get()
@@ -471,7 +475,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
                     # WARNING!!!!!!!!
                     new_pos = neighbor.get_pos()
-                    if not new_pos in closed and not new_pos in pickup_checked:
+                    if not new_pos in closed and ( new_pos == end_cur_pos or not grid[new_pos[0]][new_pos[1]].is_pickups()):
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
                         g_n =  g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
@@ -582,7 +586,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                 for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
                     # WARNING!!!!!!!!
                     new_pos = neighbor.get_pos()
-                    if not new_pos in closed:
+                    if not new_pos in closed and ( new_pos == end_cur_pos or not grid[new_pos[0]][new_pos[1]].is_pickups()):
                         # print(f"\tAdd neighbor {new_pos}")
                         # NOTE: g[r][c].get_bonus()
                         g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus
@@ -645,7 +649,7 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
         for neighbor in grid[cur_pos[0]][cur_pos[1]].neighbors:
             # WARNING!!!!!!!!
             new_pos = neighbor.get_pos()
-            if not new_pos in closed:
+            if not new_pos in closed and ( new_pos == end_cur_pos or not grid[new_pos[0]][new_pos[1]].is_pickups()):
                 # print(f"\tAdd neighbor {new_pos}")
                 # NOTE: g[r][c].get_bonus()
                 g_n = g[cur_pos[0]][cur_pos[1]] + grid[new_pos[0]][new_pos[1]].bonus

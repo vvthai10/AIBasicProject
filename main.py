@@ -30,7 +30,7 @@ def run():
     
     for level in levels:
         for file in files[level]:
-            maze, bonus_points, pickup_points, portal_points = read_file("./source/input/" + level + "/" + file)
+            maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
             
             ROWS = len(maze)
             COLS = len(maze[0])
@@ -99,9 +99,9 @@ def run():
                     if(alg == "algo1"):
                         way, cost = algorithm_handle_bonus_pickup(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
                         is_alg_do = True
-                    if(alg == "algo2"):
-                        way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
-                        is_alg_do = True
+                    # if(alg == "algo2"):
+                    #     way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
+                    #     is_alg_do = True
                 elif level == "advance":
                     if(alg == "algo1"):
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
@@ -117,7 +117,7 @@ def run():
                     write_file(dir_output + "/" + alg + ".txt", cost )
                     video.make_mp4(dir_output+ "/" + alg)
                     video.destroy_png()
-                    maze, bonus_points, pickup_points, portal_points = read_file("./source/input/" + level + "/" + file)
+                    maze, bonus_points, pickup_points, portal_points = read_file("./input/" + level + "/" + file)
                     make_image(maze,bonus_points, pickup_points, portal_points,start,end,way,DIR_OUTPUT + dir_output + "/" + alg )
                 pygame.quit()
             
