@@ -8,7 +8,7 @@ def algorithm_dfs(draw, grid, start, end, clock):
 
     stack = []
     stack.append(start.get_pos())
-    start_time = dt.datetime.now()
+    # start_time = dt.datetime.now()
     while len(stack) != 0:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -27,10 +27,10 @@ def algorithm_dfs(draw, grid, start, end, clock):
 
         # Khi điểm đang duyệt là điểm đích -> ngưng duyệt và tìm kiếm đường đi nhờ vào parent.
         if pos == end.get_pos():
-            end_time = dt.datetime.now()
-            time_diff = (end_time - start_time)
-            execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            # end_time = dt.datetime.now()
+            # time_diff = (end_time - start_time)
+            # execution_time = time_diff.total_seconds() * 1000
+            # print(f"Finish: {execution_time} ms.")
             pos_start = start.get_pos()
 
             child = end.get_pos()            

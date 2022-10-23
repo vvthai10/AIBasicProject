@@ -61,8 +61,9 @@ def run():
                     for node in row:
                         node.update_neighbors(grid)            
                 
-                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
-                # SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+                pygame.display.set_caption("Simulation of finding the way")
+                # SCREEN = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.HIDDEN)
+                SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
                 is_alg_do = False # kiem tra co thuat toan nao chay  khong
                 if level == "level_1":
                     if(alg == "dfs"):
@@ -106,7 +107,6 @@ def run():
                         is_alg_do = True
                 elif level == "level_3":
                     if(alg == "algo1"):
-                        print("Start ", alg, " with maze", file, " in folder", level )
                         print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_handle_bonus_pickup(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
                         is_alg_do = True
@@ -222,7 +222,6 @@ Start simulation
 # video.destroy_png()
 
 if __name__ == "__main__":
-    pygame.display.set_caption("Simulation of finding the way")
     video = Video((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
     run()

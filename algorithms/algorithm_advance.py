@@ -739,7 +739,7 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
     parents = {}             # contain positions
     checkpoint_pos = start.get_pos()
     open.put((heuristic(start), start))
-    start_time = dt.datetime.now()
+    # start_time = dt.datetime.now()
 
     while not open.empty():
         value_heuristic, node = open.get()
@@ -757,10 +757,10 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
             way = way + tmp_way
             
             way.reverse()   #phục vụ cho việc vẽ ra file .png
-            end_time = dt.datetime.now()
-            time_diff = (end_time - start_time)
-            execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            # end_time = dt.datetime.now()
+            # time_diff = (end_time - start_time)
+            # execution_time = time_diff.total_seconds() * 1000
+            # print(f"Finish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
         elif node != start:
             node.make_open()
