@@ -21,7 +21,7 @@ def reconstruct_path(way, grid, draw, clock):
         cost = cost  + node.get_bonus()
         clock.tick(FPS)
         draw()
-    print ("Road costs: ", cost)
+    print ("\tRoad costs: ", cost)
     
     return way, cost
 def getItem(priorityQueue):

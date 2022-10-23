@@ -106,20 +106,21 @@ def run():
                         way, cost = algorithm_bonus_astar(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, start, end, clock)
                         is_alg_do = True
                 elif level == "level_3":
-                    if(alg == "algo1"):
+                    if(alg == "algo2"):
                         print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_handle_bonus_pickup(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_queue, pickup_queue, start, end, clock)
                         is_alg_do = True
-                    # if(alg == "algo2"):
-                    #     way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
-                    #     is_alg_do = True
+                    if(alg == "algo1"):
+                        print("Start ", alg, " with maze", file, " in folder", level )
+                        way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
+                        is_alg_do = True
                 elif level == "advance":
                     if(alg == "algo1"):
                         print("Start ", alg, " with maze", file, " in folder", level )
                         way, cost = algorithm_handle_all(lambda: draw(SCREEN, grid, ROWS, COLS, WIDTH, HEIGHT, video), grid, bonus_points, pickup_points, portal_points, start, end,clock)
                         is_alg_do = True
                 if(is_alg_do):
-                    print("Done ", alg, " with maze", file, " in folder", level )
+                    # print("Done ", alg, " with maze", file, " in folder", level )
                     dir_output = ""
                     if(alg.split("_")[0] == "gbfs" or alg.split("_")[0] == "astar"):
                         dir_output = level + "/" + file.split(".")[0] + "/" + alg.split("_")[0]

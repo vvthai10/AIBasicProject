@@ -121,7 +121,7 @@ class Video:
         video.release()
 
     def destroy_png(self):
-        print("Processing destroy images.")
+        print("\tProcessing destroy images.")
         self.cnt = 0
         for filename in os.listdir(self.path):
             file_path = os.path.join(self.path, filename)
@@ -132,5 +132,5 @@ class Video:
                     shutil.rmtree(file_path)
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
-        print("Finish destroy images.")
+        # print("Finish destroy images.")
 

@@ -149,7 +149,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
                 end_time = dt.datetime.now()
                 time_diff = (end_time - start_time)
                 execution_time = time_diff.total_seconds() * 1000
-                print(f"Finish: {execution_time} ms.")
+                print(f"\tFinish: {execution_time} ms.")
                 return reconstruct_path(WAYS_TOTAL, grid, draw, clock)
 
             if (r, c) == pos_end:
@@ -253,7 +253,7 @@ def algorithm_bonus_astar(draw, grid, bonus, start, end, clock):
             end_time = dt.datetime.now()
             time_diff = (end_time - start_time)
             execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            print(f"\tFinish: {execution_time} ms.")
             return reconstruct_path(WAYS_TOTAL, grid, draw, clock)
         
         grid[r][c].make_open()
@@ -463,8 +463,8 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     v, (r, c) = bonus.get()
                     if (r, c) != cur_pos:
                         backup_bonus.put((v, (r, c))) 
-                    else:
-                        print(f"Cur pos {(r, c)} is bonus")
+                    # else:
+                    #     print(f"Cur pos {(r, c)} is bonus")
                 
                 while not backup_bonus.empty():
                     v, (r, c) = backup_bonus.get()
@@ -651,14 +651,14 @@ def algorithm_handle_bonus_pickup(draw, grid, bonus, pickups, start, end, clock)
                     
             # print(WAYS_TOTAL)
             WAYS_TOTAL.reverse()
-            print(END_POS)
+            # print(END_POS)
             
             #print(g[end_pos[0]][end_pos[1]])
             
             end_time = dt.datetime.now()
             time_diff = (end_time - start_time)
             execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            print(f"\tFinish: {execution_time} ms.")
 
 
 
@@ -739,7 +739,7 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
     parents = {}             # contain positions
     checkpoint_pos = start.get_pos()
     open.put((heuristic(start), start))
-    # start_time = dt.datetime.now()
+    start_time = dt.datetime.now()
 
     while not open.empty():
         value_heuristic, node = open.get()
@@ -757,10 +757,10 @@ def algorithm_handle_all(draw, grid, bonus_list, pickup_list, portal_list, start
             way = way + tmp_way
             
             way.reverse()   #phục vụ cho việc vẽ ra file .png
-            # end_time = dt.datetime.now()
-            # time_diff = (end_time - start_time)
-            # execution_time = time_diff.total_seconds() * 1000
-            # print(f"Finish: {execution_time} ms.")
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"\tFinish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
         elif node != start:
             node.make_open()

@@ -48,7 +48,11 @@ def algorithm_astar_heuristic_1(draw, grid, start, end, clock):
                 parent = parents[child]
 
             way.insert(0,end.get_pos())   
-            print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
+            # print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
+            end_time = dt.datetime.now()
+            time_diff = (end_time - start_time)
+            execution_time = time_diff.total_seconds() * 1000
+            print(f"\tFinish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
         
         if not grid[x_cur][y_cur].is_start():
@@ -124,11 +128,11 @@ def algorithm_astar_heuristic_2(draw, grid, start, end, clock):
                 parent = parents[child]
 
             way.insert(0,end.get_pos())   
-            print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
+            # print(f"Chi phí đường đi của thuật toán A*: {g[x_cur][y_cur]}" )
             end_time = dt.datetime.now()
             time_diff = (end_time - start_time)
             execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            print(f"\tFinish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
         
         if not grid[x_cur][y_cur].is_start():

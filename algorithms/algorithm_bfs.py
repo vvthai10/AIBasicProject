@@ -38,7 +38,7 @@ def algorithm_bfs(draw, grid, start, end, clock):
             end_time = dt.datetime.now()
             time_diff = (end_time - start_time)
             execution_time = time_diff.total_seconds() * 1000
-            print(f"Finish: {execution_time} ms.")
+            print(f"\tFinish: {execution_time} ms.")
             return reconstruct_path(way, grid, draw, clock)
             
 
