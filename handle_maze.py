@@ -34,6 +34,7 @@ class Node:
         self.alpha = 255    
         self.portal_num = -1      
         self.view_bonus = 1
+        self.pick_up_move = 0
 
 
     def change_alpha(self):
