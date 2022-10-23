@@ -95,11 +95,13 @@ class Video:
     
     def make_png(self,screen):
         self.cnt+=1
-        fullpath = self.path + self.name + "%08d.png" % self.cnt
+        fullpath = self.path  + self.name + "%08d.png" % self.cnt
         # print(fullpath)
         pygame.image.save(screen,fullpath)
  
     def make_mp4(self, name):
+        # akt_dir, subdirs, files = os.walk("./images")
+        # print(subdirs)
         image_folder = self.path
         video_name = PATH_VIDEO +  name + '.mp4'
 
@@ -119,7 +121,7 @@ class Video:
         video.release()
 
     def destroy_png(self):
-        print("Destroy images")
+        print("Processing destroy images.")
         self.cnt = 0
         for filename in os.listdir(self.path):
             file_path = os.path.join(self.path, filename)
@@ -130,5 +132,5 @@ class Video:
                     shutil.rmtree(file_path)
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
-        print("Finish!!!")
+        print("Finish destroy images.")
 
