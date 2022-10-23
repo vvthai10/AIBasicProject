@@ -1,0 +1,40 @@
+12 7 2
+10 5 -28
+13 15 -21
+13 2 -49
+5 1 -8
+15 13 -40
+6 14 -24
+7 17 -520
+13 30 -50
+5 10 -30
+13 14 -50
+4 23 -11
+4 25 -2
+8 14
+7 11
+9 12
+16 6
+13 8
+5 20
+10 13
+9 14 3 2
+10 1 5 11
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+x     x          x   x          x
+x       x      x       x x      x
+xx  x     x         x           x
+x             x        + +     xx
+ +        +  x   x  +           x
+xx         x  +    x    x       x
+x          +    x+x             x
+x       x     +x    x       S   x
+x      x   x+          x        x
+x   x+x      +x          x      x
+x               x   x     *    xx
+x        x     x x        x x   x
+x +     +     ++              + x
+x                x   x       x  x
+x   x      x +x        x        x
+x x   +         x     x    x    x
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
