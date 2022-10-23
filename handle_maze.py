@@ -29,6 +29,7 @@ class Node:
         self.total_cols = total_cols
         self.alpha = 255    
         self.portal_num = -1      
+        self.view_bonus = 1
         pygame.init()
 
 
@@ -135,9 +136,9 @@ class Node:
         # shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
         # pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
         # surface.blit(shape_surf, rect)
-        font = pygame.font.SysFont('Arial', 20)  
-        if self.is_bonus():
-            screen.blit(font.render(str(int(self.bonus)), True, BLACK),
+        font = pygame.font.SysFont('Arial', 14)  
+        if self.view_bonus < 0:
+            screen.blit(font.render(str(int(self.view_bonus)), True, BLACK),
                         (self.x + self.size/4, self.y + self.size/4))
         if not self.is_wall() and self.portal_num != -1:
             screen.blit(font.render(str(int(self.portal_num)), True, WHITE),
@@ -221,6 +222,7 @@ def merge_bonus_grid(bonus_points, grid):
         bonus_queue.put((point[2], (point[0], point[1])))
         grid[point[0]][point[1]].make_bonus()
         grid[point[0]][point[1]].bonus = point[2]
+        grid[point[0]][point[1]].view_bonus = point[2]
         i += 1
     
     # print(i)

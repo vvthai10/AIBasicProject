@@ -17,5 +17,5 @@ ORANGE = (234, 194 ,84)
 GREY = (126,126,121)
 TURQUOISE = (47, 66, 206)
 
-PATH_IMAGES =  "./source/images/"
+PATH_IMAGES =  "./images/"
 PATH_VIDEO = os.path.dirname(__file__) + "\\output\\"

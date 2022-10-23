@@ -42,7 +42,7 @@ def write_file(file_name, cost = 0):
     f.write(str(cost))
     f.close()
 
-DIR_INPUT = "./source/input/"
+DIR_INPUT = "./input/"
 def list_file():
   
   dir_list = os.listdir(DIR_INPUT)
@@ -56,7 +56,7 @@ def list_file():
   
   return dir_list, files
 
-DIR_OUTPUT = "./source/output/"
+DIR_OUTPUT = "./output/"
 def create_folder(directory):
   if(not os.path.exists(DIR_OUTPUT + directory)):
     os.makedirs(DIR_OUTPUT + directory)
